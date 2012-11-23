@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="./javascript/jquery.tokenpicker.js"></script>
+  <link rel="stylesheet" href="./stylesheet/jquery.tokenpicker.css" />
+</head>
+<body>
+  <h1>jquery.tokenpicker</h1>
+
+  <input type="text" name="name_token" />
+  <script type="text/javascript">
+  <!--
+  jQuery("input[name=name_token]").tokenpicker({
+    tokens: [
+      { id:  1, name: "北海道",   kana: "ほっかいどう", en: "hokkaido"  },
+      { id:  2, name: "青森県",   kana: "あおもりけん", en: "aomori"    },
+      { id:  3, name: "岩手県",   kana: "いわてけん",   en: "iwate"     },
+      { id:  4, name: "宮城県",   kana: "みやぎけん",   en: "miyagi"    },
+      { id:  5, name: "秋田県",   kana: "あきたけん",   en: "akita"     },
+      { id:  6, name: "山形県",   kana: "やまがたけん", en: "yamagata"  },
+      { id:  7, name: "福島県",   kana: "ふくしまけん", en: "fukushima" },
+      { id:  8, name: "茨城県",   kana: "いばらきけん", en: "ibaraki"   },
+      { id:  9, name: "栃木県",   kana: "とちぎけん",   en: "tochigi"   },
+      { id: 10, name: "群馬県",   kana: "ぐんまけん",   en: "gumma"     },
+      { id: 11, name: "埼玉県",   kana: "さいたまけん", en: "saitama"   },
+      { id: 12, name: "千葉県",   kana: "ちばけん",     en: "chiba"     },
+      { id: 13, name: "東京都",   kana: "とうきょうと", en: "toukyou"   },
+      { id: 14, name: "神奈川県", kana: "かながわけん", en: "kanagawa"  },
+      { id: 15, name: "新潟県",   kana: "にいがたけん", en: "niigata"   },
+      { id: 16, name: "富山県",   kana: "とやまけん",   en: "toyama"    },
+      { id: 17, name: "石川県",   kana: "いしかわけん", en: "ishikawa"  },
+      { id: 18, name: "福井県",   kana: "ふくいけん",   en: "fukui"     },
+      { id: 19, name: "山梨県",   kana: "やまなしけん", en: "yamanashi" },
+      { id: 20, name: "長野県",   kana: "ながのけん",   en: "nagano"    },
+      { id: 21, name: "岐阜県",   kana: "ぎふけん",     en: "gifu"      },
+      { id: 22, name: "静岡県",   kana: "しずおかけん", en: "shizuoka"  },
+      { id: 23, name: "愛知県",   kana: "あいちけん",   en: "aichi"     },
+      { id: 24, name: "三重県",   kana: "みえけん",     en: "mie"       },
+      { id: 25, name: "滋賀県",   kana: "しがけん",     en: "shiga"     },
+      { id: 26, name: "京都府",   kana: "きょうとふ",   en: "kyoto"     },
+      { id: 27, name: "大阪府",   kana: "おおさかふ",   en: "osaka"     },
+      { id: 28, name: "兵庫県",   kana: "ひょうごけん", en: "hyogo"     },
+      { id: 29, name: "奈良県",   kana: "ならけん",     en: "nara"      },
+      { id: 30, name: "和歌山県", kana: "わかやまけん", en: "wakayama"  },
+      { id: 31, name: "鳥取県",   kana: "とっとりけん", en: "tottori"   },
+      { id: 32, name: "島根県",   kana: "しまねけん",   en: "shimane"   },
+      { id: 33, name: "岡山県",   kana: "おかやまけん", en: "okayama"   },
+      { id: 34, name: "広島県",   kana: "ひろしまけん", en: "hiroshima" },
+      { id: 35, name: "山口県",   kana: "やまぐちけん", en: "yamaguchi" },
+      { id: 36, name: "徳島県",   kana: "とくしまけん", en: "tokushima" },
+      { id: 37, name: "香川県",   kana: "かがわけん",   en: "kagawa"    },
+      { id: 38, name: "愛媛県",   kana: "えひめけん",   en: "ehime"     },
+      { id: 39, name: "高知県",   kana: "こうちけん",   en: "kouchi"    },
+      { id: 40, name: "福岡県",   kana: "ふくおかけん", en: "fukuoka"   },
+      { id: 41, name: "佐賀県",   kana: "さがけん",     en: "saga"      },
+      { id: 42, name: "長崎県",   kana: "ながさきけん", en: "nagasaki"  },
+      { id: 43, name: "熊本県",   kana: "くまもとけん", en: "kumamoto"  },
+      { id: 44, name: "大分県",   kana: "おおいたけん", en: "oita"      },
+      { id: 45, name: "宮崎県",   kana: "みやざきけん", en: "miyazaki"  },
+      { id: 46, name: "鹿児島県", kana: "かごしまけん", en: "kagoshima" },
+      { id: 47, name: "沖縄県",   kana: "おきなわけん", en: "okinawa"   }
+    ],
+    searchKeys: [ 'name', 'kana', 'en' ],
+    labelKey:   'name',
+    tokenKey:   'id'
+  });
+  -->
+  </script>
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+</body>
+</html>

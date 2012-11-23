@@ -1,0 +1,85 @@
+.tokenpicker_base
+{
+}
+.tokenpicker_frame
+{
+  border: 1px solid #999999;
+  clear: left;
+  cursor: text;
+  height: auto !important;
+  list-style-type: none;
+  margin: 0;
+  min-height: 1px;
+  overflow: hidden;
+  padding: 0;
+  z-index: 999;
+}
+.tokenpicker_frame_items
+{
+  float: left;
+  list-style-type: none;
+  margin: none;
+  padding: none;
+
+  color:      #666666;
+  font-size:  1.1em;
+  font-family: sans-serif;
+}
+.tokenpicker_frame_picked_token
+{
+  background-color: #eff2f7;
+  border: 1px solid #ccd5e4;
+  border-radius: 5px 5px 5px 5px;
+  cursor: default;
+  height: auto !important;
+  margin: 3px;
+  overflow: hidden;
+  padding: 2px 3px;
+  white-space: nowrap;
+
+  color: #000000;
+}
+.tokenpicker_label
+{
+}
+.tokenpicker_input
+{
+  /* FIXME: temporary colored */
+  background-color: #ffffcc;
+  border:     0 none;
+  padding:    5px;
+  min-width:  50px;
+
+  color:      #666666;
+  font-size:  1.2em;
+  font-family: sans-serif;
+}
+.tokenpicker_search
+{
+  border: 1px solid #999999;
+  cursor: pointer;
+  height: auto !important;
+  list-style-type: none;
+  margin: 0;
+  min-height: 1px;
+  overflow: hidden;
+  padding: 0;
+  z-index: 999;
+}
+.tokenpicker_searched_items
+{
+  list-style-type: none;
+  margin: none;
+  padding: 3px;
+
+  color:      #666666;
+  font-size:  1.2em;
+  font-family: sans-serif;
+}
+.tokenpicker_candidates_found
+{
+}
+.tokenpicker_current_pick
+{
+  background-color: #add8e6 !important;
+}
