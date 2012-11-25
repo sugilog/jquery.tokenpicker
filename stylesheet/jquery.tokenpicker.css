@@ -43,6 +43,15 @@
 
   color: #000000;
 }
+.tokenpicker_remove_token
+{
+  margin-left: 5px;
+
+  cursor: pointer;
+
+  color: #999999;
+  font-weight: bold;
+}
 .tokenpicker_input
 {
   padding: 5px;

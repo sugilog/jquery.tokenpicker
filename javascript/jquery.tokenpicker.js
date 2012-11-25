@@ -31,6 +31,7 @@ $.fn.tokenpicker = function(_options) {
       tokenItems:      "tokenpicker_frame_items",
       pickedToken:     "tokenpicker_frame_picked_token",
       input:           "tokenpicker_input",
+      removeToken:     "tokenpicker_remove_token",
       candidatesArea:  "tokenpicker_candidates_area",
       tokenCandidates: "tokenpicker_token_candidates",
       found:           "tokenpicker_candidates_found",
@@ -120,8 +121,17 @@ $.fn.tokenpicker = function(_options) {
           $("<li>")
             .addClass( tokenpickerItems.cssClass.tokenItems )
             .addClass( tokenpickerItems.cssClass.pickedToken )
-            .text( _label )
             .data( _data )
+            .append(
+              $("<span>")
+                .text( _label )
+            )
+            .append(
+              $("<span>")
+                .addClass( tokenpickerItems.cssClass.removeToken )
+                .text( "×" )
+                .on("click.tokenpicker", events.onRemoveToken)
+            )
         );
     },
     candidatesArea: function(tokenCandidates) {
@@ -181,6 +191,10 @@ $.fn.tokenpicker = function(_options) {
             })
             .toArray();
         return _tokens || [];
+      },
+      setVal: function() {
+        var pickedTokens = tokenpickerWidget.pickedToken.tokens();
+        $(_this).val(pickedTokens.join( tokenpickerItems.tokenSeparator ));
       }
     },
     candidateItem: {
@@ -271,12 +285,17 @@ $.fn.tokenpicker = function(_options) {
 
       if (current.length > 0) {
         tokenpickerWidget.token(current);
-        var pickedTokens = tokenpickerWidget.pickedToken.tokens();
-        $(_this).val(pickedTokens.join( tokenpickerItems.tokenSeparator ));
+        tokenpickerWidget.pickedToken.setVal();
       }
 
       events.onCloseCandidates.apply(this, [_event]);
       events.afterCloseCandidates.apply(this, [_event]);
+    },
+    onRemoveToken: function(_event) {
+      $(this)
+        .closest( "." + tokenpickerItems.cssClass.pickedToken )
+        .remove();
+      tokenpickerWidget.pickedToken.setVal();
     },
     outerClick: function() {
       $("." + tokenpickerItems.cssClass.base).outerOff("click.tokenpicker");
@@ -348,9 +367,9 @@ if (typeof $.fn.outerOn === "undefined" && typeof $.fn.outerOff === "undefined")
 
     var callback = args.shift();
 
-    $(selector).on(handleEvent, function(e) {
-      if ($(e.target).closest(_this).length === 0) {
-        callback.apply(_this, [e]);
+    $(selector).on(handleEvent, function(_event) {
+      if ($(_event.target).closest(_this).length === 0) {
+        callback.apply(_this, [_event]);
       }
     });
   };
