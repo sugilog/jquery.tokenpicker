@@ -58,10 +58,6 @@
   color: #eff2f7;
   font-family: sans-serif;
 }
-.tokenpicker_frame_sortable_placeholder:after
-{
-  content: "here";
-}
 .tokenpicker_remove_token
 {
   margin-left: 5px;

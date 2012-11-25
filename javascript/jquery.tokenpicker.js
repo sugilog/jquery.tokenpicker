@@ -11,8 +11,6 @@ $.fn.tokenpicker = function(_options) {
   var _this = this;
   _options = _options ? _options : {};
 
-  // FIXME: check options arguments
-
   var _tokens = $(_options.tokens).map(function(_, _token) {
     var searchValues = $(_options.searchKeys).map(function(_, key) {
       return _token[ key ];
@@ -25,6 +23,7 @@ $.fn.tokenpicker = function(_options) {
     baseName: $(_this).prop("name"),
     tokens:   _tokens,
     tokenSeparator: (_options.separator || ","),
+    placeholderText: (_options.placeholderText || "HERE"),
     cssClass: {
       base:                 "tokenpicker_base",
       frame:                "tokenpicker_frame",
@@ -76,9 +75,10 @@ $.fn.tokenpicker = function(_options) {
         // EVENT: sort ( required jquery ui sortable; experimental )
         .sortable({
           placeholder: tokenpickerItems.cssClass.sortablePlaceholder,
-          update: function(_event, ui) {
-            tokenpickerWidget.pickedToken.setVal();
-          }
+          // EVENT: start sorting
+          start: events.onSortableStart,
+          // EVENT: end sorting
+          update: events.onSortableUpdate
         })
         .appendTo( $(tokenpickerWidget.baseId) );
     },
@@ -356,6 +356,12 @@ $.fn.tokenpicker = function(_options) {
           events.onCloseCandidates.apply(this, [_event]);
         });
       });
+    },
+    onSortableStart: function(_event, ui) {
+      $("." + tokenpickerItems.cssClass.sortablePlaceholder).text( tokenpickerItems.placeholderText );
+    },
+    onSortableUpdate: function(_event, ui) {
+      tokenpickerWidget.pickedToken.setVal();
     }
   }
 
