@@ -270,6 +270,8 @@ $.fn.tokenpicker = function(_options) {
       // enter    : 13
       // up       : 38
       // down     : 40
+      // left     : 37
+      // right    : 39
       // backspace: 46
 
       switch(_event.keyCode.toString()) {
@@ -278,11 +280,33 @@ $.fn.tokenpicker = function(_options) {
           return false;
         case "38":
         case "40":
-          var target = tokenpickerWidget.candidateItem[ (_event.keyCode == "38") ? "prev" : "next" ]();
+          var target = tokenpickerWidget.candidateItem[ (_event.keyCode.toString() === "38") ? "prev" : "next" ]();
 
           if (target.length > 0) {
             tokenpickerWidget.candidateItem.setCurrentPick(target)
           }
+
+          break;
+        case "37":
+        case "39":
+          if ($(tokenpickerWidget.inputId).val() !== "") {
+            break;
+          }
+
+          var selector, append;
+
+          if (_event.keyCode.toString() === "37") {
+            selector = "prev";
+            append   = "before";
+          }
+          else {
+            selector = "next";
+            append   = "after";
+          }
+
+          var target = $(tokenpickerWidget.inputId).closest("li")[selector]();
+          target[append]( $(tokenpickerWidget.inputId).closest("li") );
+          $(tokenpickerWidget.inputId).get(0).focus();
 
           break;
         case  "8":
