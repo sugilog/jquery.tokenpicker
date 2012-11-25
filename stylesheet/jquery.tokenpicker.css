@@ -43,6 +43,25 @@
 
   color: #000000;
 }
+.tokenpicker_frame_sortable_placeholder
+{
+  margin: 3px;
+  padding: 2px 3px;
+  height: auto !important;
+
+  float: left;
+  list-style-type: none;
+
+  border: 1px dotted #ccd5e4;
+  border-radius: 5px 5px 5px 5px;
+
+  color: #eff2f7;
+  font-family: sans-serif;
+}
+.tokenpicker_frame_sortable_placeholder:after
+{
+  content: "here";
+}
 .tokenpicker_remove_token
 {
   margin-left: 5px;

@@ -26,17 +26,18 @@ $.fn.tokenpicker = function(_options) {
     tokens:   _tokens,
     tokenSeparator: (_options.separator || ","),
     cssClass: {
-      base:            "tokenpicker_base",
-      frame:           "tokenpicker_frame",
-      tokenItems:      "tokenpicker_frame_items",
-      pickedToken:     "tokenpicker_frame_picked_token",
-      input:           "tokenpicker_input",
-      removeToken:     "tokenpicker_remove_token",
-      candidatesArea:  "tokenpicker_candidates_area",
-      tokenCandidates: "tokenpicker_token_candidates",
-      found:           "tokenpicker_candidates_found",
-      notFound:        "tokenpicker_candidates_not_found",
-      currentPick:     "tokenpicker_current_pick"
+      base:                 "tokenpicker_base",
+      frame:                "tokenpicker_frame",
+      tokenItems:           "tokenpicker_frame_items",
+      pickedToken:          "tokenpicker_frame_picked_token",
+      sortablePlaceholder : "tokenpicker_frame_sortable_placeholder",
+      input:                "tokenpicker_input",
+      removeToken:          "tokenpicker_remove_token",
+      candidatesArea:       "tokenpicker_candidates_area",
+      tokenCandidates:      "tokenpicker_token_candidates",
+      found:                "tokenpicker_candidates_found",
+      notFound:             "tokenpicker_candidates_not_found",
+      currentPick:          "tokenpicker_current_pick"
     }
   };
 
@@ -72,6 +73,13 @@ $.fn.tokenpicker = function(_options) {
         .on("click.tokenpicker", function() {
           $(tokenpickerWidget.inputId).get(0).focus();
         })
+        // EVENT: sort ( required jquery ui sortable; experimental )
+        .sortable({
+          placeholder: tokenpickerItems.cssClass.sortablePlaceholder,
+          update: function(_event, ui) {
+            tokenpickerWidget.pickedToken.setVal();
+          }
+        })
         .appendTo( $(tokenpickerWidget.baseId) );
     },
     inputField: function() {
@@ -87,7 +95,9 @@ $.fn.tokenpicker = function(_options) {
           // EVENT: observe inputing
           .observeField(0.15, events.onInputSearchWord)
           // EVENT: focus inputing
-          .on("focus.tokenpicker", events.onFocusInputField);
+          .on("focus.tokenpicker", events.onFocusInputField)
+          // EVENT: key control
+          .on("keydown.tokenpicker", events.onSelectTokenCandidates);
 
       $("<li>")
         .addClass( tokenpickerItems.cssClass.tokenItems )
@@ -130,6 +140,7 @@ $.fn.tokenpicker = function(_options) {
               $("<span>")
                 .addClass( tokenpickerItems.cssClass.removeToken )
                 .text( "×" )
+                // EVENT: remove token item
                 .on("click.tokenpicker", events.onRemoveToken)
             )
         );
@@ -385,13 +396,10 @@ $.fn.tokenpicker = function(_options) {
     }
   }
 
-
   tokenpickerWidget.build();
-  $(document).on("keydown", tokenpickerWidget.inputId, events.onSelectTokenCandidates);
-  $(document).on("mouseover", tokenpickerWidget.candidatesAreaId + " li", events.onMouseoverCandidates);
-  $(document).on("click", tokenpickerWidget.candidatesAreaId + " li", events.onClickCandidate);
+  $(document).on("mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onMouseoverCandidates);
+  $(document).on("click.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onClickCandidate);
   events.outerClick();
-
 }
 
 if (typeof $.fn.outerOn === "undefined" && typeof $.fn.outerOff === "undefined") {
