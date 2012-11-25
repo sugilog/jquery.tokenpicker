@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Jquery.tokenpicker by sugilog</title>
+    <title>jquery.tokenpicker by sugilog</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -15,7 +15,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Jquery.tokenpicker</h1>
+        <h1>jquery.tokenpicker</h1>
         <p></p>
 
         <p class="view"><a href="https://github.com/sugilog/jquery.tokenpicker">View the Project on GitHub <small>sugilog/jquery.tokenpicker</small></a></p>
@@ -30,11 +30,125 @@
       <section>
         <h1>jquery.tokenpicker</h1>
 
-<p>underconstruction</p>
+<p>You can build multi-pickable text field.</p>
 
-<h2>Options</h2>
+<h2>Require</h2>
+
+<ul>
+<li>jQuery 1.7+</li>
+<li>jQuery UI 1.8+</li>
+</ul><h2>Options</h2>
+
+<dl>
+<dt>onPick</dt>
+  <dd>
+    [function] onPick callback.
+
+    <dl>
+<dt>this</dt>
+      <dd>
+        [jQuery object] tokenpicker caller
+      </dd>
+      <dt>arguments</dt>
+      <dd>
+        "item" of picked (selected) item. (jQuery dom object)
+      </dd>
+    </dl>
+</dd>
+  <dt>onRemove</dt>
+  <dd>
+    [function] onRemove callback.
+
+    <dl>
+<dt>this</dt>
+      <dd>
+        [jQuery object] tokenpicker caller
+      </dd>
+      <dt>arguments</dt>
+      <dd>
+        "item" of picked (selected) item. (data; dom object has been removed)
+      </dd>
+    </dl>
+</dd>
+  <dt>onSort</dt>
+  <dd>
+    [function] onSort callback.
+
+    <dl>
+<dt>this</dt>
+      <dd>
+        [jQuery object] tokenpicker caller
+      </dd>
+      <dt>arguments</dt>
+      <dd>
+        "items" of picked (selected) items. (jQuery dom object)
+      </dd>
+    </dl>
+</dd>
+  <dt>tokens</dt>
+  <dd>
+    [Arrayed Hashes][required] search tokens by hash
+  </dd>
+  <dt>searchKeys</dt>
+  <dd>
+    [Arrayed Strings][required] keys of tokens to use as search value.
+  </dd>
+  <dt>labelKeys</dt>
+  <dd>
+    [Arrayed Strings][required] keys of tokens to use as label for candidates and picked item.
+  </dd>
+  <dt>tokenKey</dt>
+  <dd>
+    [String][required] key of tokens to use as token for field value.
+  </dd>
+  <dt>separator</dt>
+  <dd>
+    [String] string for tokens joining separator. (default: comma ',' )
+  </dd>
+  <dt>placeholders.sort</dt>
+  <dd>
+    [String] placeholder text on sort. (default: 'HERE' )
+  </dd>
+  <dt>placeholders.start</dt>
+  <dd>
+    [String] placeholder text on start searching. (default: 'Type to search...' )
+  </dd>
+  <dt>placeholders.none</dt>
+  <dd>
+    [String] placeholder text on no searched result. (default: 'No Results.' )
+  </dd>
+</dl><p>example:</p>
+
+<pre><code>&lt;input type="text" name="name_token" /&gt;
+&lt;script type="text/javascript"&gt;
+&lt;!--
+jQuery("input[name=name_token]").tokenpicker({
+  onPick: function(item){
+    // do something.
+  },
+  onRemove: function(item){
+    // do something.
+  },
+  onSort: function(items){
+    // do something.
+  },
+  searchKeys: [ 'name', 'company' ],
+  labelKey:   'name',
+  tokenKey:   'id',
+  separator:  ',',
+  tokens: [
+    { id: 1, name: "Bob",  company: "Google" },
+    { id: 2, name: "John", company: "Apple"  },
+    { id: 3, name: "Mary", company: "Google" }
+  ]
+});
+--&gt;
+&lt;/script&gt;
+</code></pre>
 
 <h2>Utility Methods</h2>
+
+<p>none. (please tell me if you need.)</p>
 
 <h2>Licence</h2>
 
