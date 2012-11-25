@@ -10,6 +10,7 @@ $.fn.tokenpicker = function(_options) {
   // prepare
   var _this = this;
   _options = _options ? _options : {};
+  _options.placeholders = _options.placeholders ? _options.placeholders : {};
 
   var _tokens = $(_options.tokens).map(function(_, _token) {
     var searchValues = $(_options.searchKeys).map(function(_, key) {
@@ -23,7 +24,11 @@ $.fn.tokenpicker = function(_options) {
     baseName: $(_this).prop("name"),
     tokens:   _tokens,
     tokenSeparator: (_options.separator || ","),
-    placeholderText: (_options.placeholderText || "HERE"),
+    placeholders: {
+      sort: (_options.placeholders.sort || "HERE"),
+      start: (_options.placeholders.start || "Type to search..."),
+      none: (_options.placeholders.none || "No Results.")
+    },
     cssClass: {
       base:                 "tokenpicker_base",
       frame:                "tokenpicker_frame",
@@ -180,11 +185,11 @@ $.fn.tokenpicker = function(_options) {
       }
 
       if (typeof tokenCandidates === "undefined") {
-        tokenCandidates = [{token: undefined, label: "Type to search..."}]
+        tokenCandidates = [{token: undefined, label: tokenpickerItems.placeholders.start}]
         candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
       }
       else if (tokenCandidates.length === 0) {
-        tokenCandidates = [{token: undefined, label: "No Results."}]
+        tokenCandidates = [{token: undefined, label: tokenpickerItems.placeholders.none}]
         candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
       }
       else {
@@ -376,7 +381,7 @@ $.fn.tokenpicker = function(_options) {
       });
     },
     onSortableStart: function(_event, ui) {
-      $("." + tokenpickerItems.cssClass.sortablePlaceholder).text( tokenpickerItems.placeholderText );
+      $("." + tokenpickerItems.cssClass.sortablePlaceholder).text( tokenpickerItems.placeholders.sort );
     },
     onSortableUpdate: function(_event, ui) {
       tokenpickerWidget.pickedToken.setVal();
