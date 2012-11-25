@@ -24,30 +24,31 @@ $.fn.tokenpicker = function(_options) {
   var tokenpickerItems = {
     baseName: $(_this).prop("name"),
     tokens:   _tokens,
+    tokenSeparator: (_options.separator || ","),
     cssClass: {
-      base:          "tokenpicker_base",
-      frame:         "tokenpicker_frame",
-      tokenItems:    "tokenpicker_frame_items",
-      pickedToken:   "tokenpicker_frame_picked_token",
-      label:         "tokenpicker_label",
-      input:         "tokenpicker_input",
-      search:        "tokenpicker_search",
-      searchedItems: "tokenpicker_searched_items",
-      found:         "tokenpicker_candidates_found",
-      currentPick:   "tokenpicker_current_pick"
+      base:            "tokenpicker_base",
+      frame:           "tokenpicker_frame",
+      tokenItems:      "tokenpicker_frame_items",
+      pickedToken:     "tokenpicker_frame_picked_token",
+      input:           "tokenpicker_input",
+      candidatesArea:  "tokenpicker_candidates_area",
+      tokenCandidates: "tokenpicker_token_candidates",
+      found:           "tokenpicker_candidates_found",
+      notFound:        "tokenpicker_candidates_not_found",
+      currentPick:     "tokenpicker_current_pick"
     }
   };
 
   var tokenpickerWidget = {
-    baseId:   ("#tokenpicker_widget_base_"   + tokenpickerItems.baseName),
-    frameId:  ("#tokenpicker_widget_frame_"  + tokenpickerItems.baseName),
-    inputId:  ("#tokenpicker_widget_input_"  + tokenpickerItems.baseName),
-    searchId: ("#tokenpicker_widget_search_" + tokenpickerItems.baseName),
+    baseId:  ("#tokenpicker_widget_base_"   + tokenpickerItems.baseName),
+    frameId: ("#tokenpicker_widget_frame_"  + tokenpickerItems.baseName),
+    inputId: ("#tokenpicker_widget_input_"  + tokenpickerItems.baseName),
+    candidatesAreaId: ("#tokenpicker_widget_candidatesArea_" + tokenpickerItems.baseName),
     build: function(){
       this.base();
       this.frame();
-      // this.existingToken()
       this.inputField();
+      this.existingTokens();
     },
     base: function() {
       $(_this)
@@ -83,66 +84,91 @@ $.fn.tokenpicker = function(_options) {
           .attr("autocomplete", "off")
           .addClass( tokenpickerItems.cssClass.input )
           // EVENT: observe inputing
-          .observeField(0.15, events.onInputSearchWord);
+          .observeField(0.15, events.onInputSearchWord)
+          // EVENT: focus inputing
+          .on("focus.tokenpicker", events.onFocusInputField);
 
       $("<li>")
         .addClass( tokenpickerItems.cssClass.tokenItems )
         .append( _input )
         .appendTo( $(tokenpickerWidget.frameId) );
     },
+    existingTokens: function() {
+      var existingTokens = $(_this).val().split( tokenpickerItems.tokenSeparator );
+      var existingItems = $.grep(tokenpickerItems.tokens, function(item) {
+        return ( $.inArray(item.token.toString(), existingTokens) !== -1 );
+      });
+      $.each(existingItems, function(_, item){
+        tokenpickerWidget.token(item);
+      });
+    },
     token: function(pickedItem) {
+      var _label, _data;
+
+      if ($.isPlainObject(pickedItem)) {
+        _label = pickedItem.label;
+        _data  = pickedItem;
+      }
+      else {
+        _label = pickedItem.data().label;
+        _data  = pickedItem.data();
+      }
+
       $(tokenpickerWidget.inputId)
         .closest("." + tokenpickerItems.cssClass.tokenItems)
         .before(
           $("<li>")
             .addClass( tokenpickerItems.cssClass.tokenItems )
             .addClass( tokenpickerItems.cssClass.pickedToken )
-            .text( pickedItem.data().label )
-            .data(pickedItem.data())
+            .text( _label )
+            .data( _data )
         );
     },
-    list: function(searchedTokens) {
-      var search = $(tokenpickerWidget.searchId);
+    candidatesArea: function(tokenCandidates) {
+      var candidatesArea = $(tokenpickerWidget.candidatesAreaId);
 
-      if ( search.length === 0 ) {
-        search =
+      if ( candidatesArea.length === 0 ) {
+        candidatesArea =
           $("<ul>")
             .prop({
-              id: tokenpickerWidget.searchId.replace("#", "")
+              id: tokenpickerWidget.candidatesAreaId.replace("#", "")
             })
-            .addClass( tokenpickerItems.cssClass.search )
-        search.appendTo( $(tokenpickerWidget.baseId) );
+            .addClass( tokenpickerItems.cssClass.candidatesArea )
+        candidatesArea.appendTo( $(tokenpickerWidget.baseId) );
       }
       else {
-        search.children().remove();
-        search.removeClass( tokenpickerItems.cssClass.found );
+        candidatesArea.children().remove();
+        candidatesArea.removeClass( tokenpickerItems.cssClass.found );
+        candidatesArea.removeClass( tokenpickerItems.cssClass.notFound );
       }
 
-      if (typeof searchedTokens !== "undefined") {
+      if (typeof tokenCandidates !== "undefined") {
         var pickedTokens = tokenpickerWidget.pickedToken.tokens();
-        searchedTokens = $(searchedTokens).map(function(_, item) {
+        tokenCandidates = $(tokenCandidates).map(function(_, item) {
           if ( $.inArray(item.token, pickedTokens) === -1 ) {
             return item;
           }
         });
       }
 
-      if (typeof searchedTokens === "undefined") {
-        searchedTokens = [{token: undefined, label: "Searching..."}]
+      if (typeof tokenCandidates === "undefined") {
+        tokenCandidates = [{token: undefined, label: "Type to search..."}]
+        candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
       }
-      else if (searchedTokens.length === 0) {
-        searchedTokens = [{token: undefined, label: "No Results."}]
+      else if (tokenCandidates.length === 0) {
+        tokenCandidates = [{token: undefined, label: "No Results."}]
+        candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
       }
       else {
-        search.addClass( tokenpickerItems.cssClass.found );
+        candidatesArea.addClass( tokenpickerItems.cssClass.found );
       }
 
-      $(searchedTokens).each(function(_, item){
+      $(tokenCandidates).each(function(_, item){
         $("<li>")
           .data(item)
-          .addClass( tokenpickerItems.cssClass.searchedItems )
+          .addClass( tokenpickerItems.cssClass.tokenCandidates )
           .text( item.label )
-          .appendTo(search);
+          .appendTo(candidatesArea);
       });
     },
     pickedToken: {
@@ -157,27 +183,27 @@ $.fn.tokenpicker = function(_options) {
         return _tokens || [];
       }
     },
-    listItem: {
+    candidateItem: {
       setCurrentPick: function(target) {
         $(target).siblings().removeClass(tokenpickerItems.cssClass.currentPick);
         $(target).addClass(tokenpickerItems.cssClass.currentPick);
       },
       currentPick: function() {
-        var list = $(tokenpickerWidget.searchId);
+        var candidatesArea = $(tokenpickerWidget.candidatesAreaId);
         var current = jQuery(undefined);
 
-        if (list.hasClass(tokenpickerItems.cssClass.found)) {
-          current = list.find("." + tokenpickerItems.cssClass.currentPick);
+        if (candidatesArea.hasClass(tokenpickerItems.cssClass.found)) {
+          current = candidatesArea.find("." + tokenpickerItems.cssClass.currentPick);
         }
 
         return current;
       },
       next: function() {
-        var current = tokenpickerWidget.listItem.currentPick();
+        var current = tokenpickerWidget.candidateItem.currentPick();
         return current.next();
       },
       prev: function() {
-        var current = tokenpickerWidget.listItem.currentPick();
+        var current = tokenpickerWidget.candidateItem.currentPick();
         return current.prev();
       }
     }
@@ -195,21 +221,35 @@ $.fn.tokenpicker = function(_options) {
       }
 
       $(base).find("." + tokenpickerItems.cssClass.input).val("");
-      $(base).find("." + tokenpickerItems.cssClass.search).remove();
+      $(base).find("." + tokenpickerItems.cssClass.candidatesArea).remove();
+    },
+    afterCloseCandidates: function(_event) {
+      $(tokenpickerWidget.inputId).get(0).focus();
+    },
+    onFocusInputField: function(_event) {
+      tokenpickerWidget.candidatesArea();
     },
     onInputSearchWord: function(_event) {
       if ($(this).val() === "") {
         events.onCloseCandidates.apply(this, [_event]);
+        events.afterCloseCandidates.apply(this, [_event]);
       }
       else {
         var result = searchUtil.exec(this);
-        tokenpickerWidget.list(result);
-        var search = $(tokenpickerWidget.searchId);
+        tokenpickerWidget.candidatesArea(result);
+        var candidatesArea = $(tokenpickerWidget.candidatesAreaId);
 
-        if ( search.hasClass(tokenpickerItems.cssClass.found) ) {
-          tokenpickerWidget.listItem.setCurrentPick(search.children().eq(0));
+        if ( candidatesArea.hasClass(tokenpickerItems.cssClass.found) ) {
+          tokenpickerWidget.candidateItem.setCurrentPick(candidatesArea.children().eq(0));
         }
       }
+    },
+    onMouseoverCandidates: function(_event) {
+      tokenpickerWidget.candidateItem.setCurrentPick(this);
+    },
+    onClickCandidate: function(_event) {
+      tokenpickerWidget.candidateItem.setCurrentPick(this);
+      events.onPickToken.apply(this, [_event]);
     },
     onSelectTokenCandidates: function(_event) {
       if (_event.keyCode == "13" || _event.keyCode == "38" || _event.keyCode == "40") {
@@ -218,22 +258,25 @@ $.fn.tokenpicker = function(_options) {
           return false;
         }
         else {
-          var target = tokenpickerWidget.listItem[ (_event.keyCode == "38") ? "prev" : "next" ]();
+          var target = tokenpickerWidget.candidateItem[ (_event.keyCode == "38") ? "prev" : "next" ]();
 
           if (target.length > 0) {
-            tokenpickerWidget.listItem.setCurrentPick(target)
+            tokenpickerWidget.candidateItem.setCurrentPick(target)
           }
         }
       }
     },
     onPickToken: function(_event) {
-      var current = tokenpickerWidget.listItem.currentPick();
+      var current = tokenpickerWidget.candidateItem.currentPick();
 
       if (current.length > 0) {
         tokenpickerWidget.token(current);
+        var pickedTokens = tokenpickerWidget.pickedToken.tokens();
+        $(_this).val(pickedTokens.join( tokenpickerItems.tokenSeparator ));
       }
 
       events.onCloseCandidates.apply(this, [_event]);
+      events.afterCloseCandidates.apply(this, [_event]);
     },
     outerClick: function() {
       $("." + tokenpickerItems.cssClass.base).outerOff("click.tokenpicker");
@@ -286,6 +329,8 @@ $.fn.tokenpicker = function(_options) {
 
   tokenpickerWidget.build();
   $(document).on("keydown", tokenpickerWidget.inputId, events.onSelectTokenCandidates);
+  $(document).on("mouseover", tokenpickerWidget.candidatesAreaId + " li", events.onMouseoverCandidates);
+  $(document).on("click", tokenpickerWidget.candidatesAreaId + " li", events.onClickCandidate);
   events.outerClick();
 
 }

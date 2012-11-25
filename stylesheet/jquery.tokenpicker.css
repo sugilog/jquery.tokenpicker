@@ -3,78 +3,84 @@
 }
 .tokenpicker_frame
 {
-  border: 1px solid #999999;
-  clear: left;
-  cursor: text;
-  height: auto !important;
-  list-style-type: none;
   margin: 0;
-  min-height: 1px;
-  overflow: hidden;
   padding: 0;
+  height: auto !important;
+  min-height: 1px;
+
+  clear: left;
+  overflow: hidden;
   z-index: 999;
+
+  cursor: text;
+  border: 1px solid #999999;
+  list-style-type: none;
 }
 .tokenpicker_frame_items
 {
-  float: left;
-  list-style-type: none;
   margin: none;
   padding: none;
 
-  color:      #666666;
-  font-size:  1.1em;
+  float: left;
+  list-style-type: none;
+
+  color: #666666;
   font-family: sans-serif;
 }
 .tokenpicker_frame_picked_token
 {
+  margin: 3px;
+  padding: 2px 3px;
+  height: auto !important;
+
+  overflow: hidden;
+  white-space: nowrap;
+
   background-color: #eff2f7;
   border: 1px solid #ccd5e4;
   border-radius: 5px 5px 5px 5px;
   cursor: default;
-  height: auto !important;
-  margin: 3px;
-  overflow: hidden;
-  padding: 2px 3px;
-  white-space: nowrap;
 
   color: #000000;
 }
-.tokenpicker_label
-{
-}
 .tokenpicker_input
 {
-  /* FIXME: temporary colored */
-  background-color: #ffffcc;
-  border:     0 none;
-  padding:    5px;
-  min-width:  50px;
+  padding: 5px;
+  width: 50px;
 
-  color:      #666666;
-  font-size:  1.2em;
+  border: 0 none;
+  outline: none;
+
+  color: #666666;
   font-family: sans-serif;
 }
-.tokenpicker_search
+.tokenpicker_candidates_area
 {
-  border: 1px solid #999999;
-  cursor: pointer;
-  height: auto !important;
-  list-style-type: none;
   margin: 0;
-  min-height: 1px;
-  overflow: hidden;
   padding: 0;
+  height: auto !important;
+  min-height: 1px;
+
   z-index: 999;
-}
-.tokenpicker_searched_items
-{
+  overflow: hidden;
+
+  border: 1px solid #999999;
   list-style-type: none;
+  cursor: pointer;
+}
+.tokenpicker_token_candidates
+{
   margin: none;
   padding: 3px;
 
-  color:      #666666;
-  font-size:  1.2em;
+  list-style-type: none;
+
+  color: #666666;
   font-family: sans-serif;
+}
+.tokenpicker_candidates_not_found
+{
+  /*font-style: italic;*/
 }
 .tokenpicker_candidates_found
 {

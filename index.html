@@ -3,14 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title></title>
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script type="text/javascript" src="./javascript/jquery.tokenpicker.js"></script>
   <link rel="stylesheet" href="./stylesheet/jquery.tokenpicker.css" />
+  <style type="text/css">
+    body {
+      font-size: 12px;
+    }
+    input{
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
   <h1>jquery.tokenpicker</h1>
 
-  <input type="text" name="name_token" />
+  <form action="">
+  <input type="submit" />
+
+  <input type="text" name="name_token" value="2,5" />
   <script type="text/javascript">
   <!--
   jQuery("input[name=name_token]").tokenpicker({
@@ -65,7 +76,8 @@
     ],
     searchKeys: [ 'name', 'kana', 'en' ],
     labelKey:   'name',
-    tokenKey:   'id'
+    tokenKey:   'id',
+    separator:  ','
   });
   -->
   </script>
@@ -99,5 +111,7 @@
   <br />
   <br />
   <br />
+
+  </form>
 </body>
 </html>
