@@ -266,18 +266,34 @@ $.fn.tokenpicker = function(_options) {
       events.onPickToken.apply(this, [_event]);
     },
     onSelectTokenCandidates: function(_event) {
-      if (_event.keyCode == "13" || _event.keyCode == "38" || _event.keyCode == "40") {
-        if (_event.keyCode == "13") {
+      // delete   :  8
+      // enter    : 13
+      // up       : 38
+      // down     : 40
+      // backspace: 46
+
+      switch(_event.keyCode.toString()) {
+        case "13":
           events.onPickToken.apply(this, [_event]);
           return false;
-        }
-        else {
+        case "38":
+        case "40":
           var target = tokenpickerWidget.candidateItem[ (_event.keyCode == "38") ? "prev" : "next" ]();
 
           if (target.length > 0) {
             tokenpickerWidget.candidateItem.setCurrentPick(target)
           }
-        }
+
+          break;
+        case  "8":
+        case "46":
+          if ($(tokenpickerWidget.inputId).val() !== "") {
+            break;
+          }
+
+          var target = $(tokenpickerWidget.inputId).closest("li")[ _event.keyCode.toString() === "8" ? "prev" : "next" ]();
+          events.onRemoveToken.apply(target, [_event]);
+          break;
       }
     },
     onPickToken: function(_event) {
