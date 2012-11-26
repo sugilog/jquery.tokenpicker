@@ -331,7 +331,10 @@ $.fn.tokenpicker = function(_options) {
 
           var target = $(tokenpickerWidget.inputId).closest("li")[selector]();
           target[append]( $(tokenpickerWidget.inputId).closest("li") );
-          $(tokenpickerWidget.inputId).get(0).focus();
+
+          setTimeout(function(){
+            $(tokenpickerWidget.inputId).get(0).focus();
+          }, 30);
 
           break;
         case  "8":
