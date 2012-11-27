@@ -442,7 +442,7 @@ if (typeof $.fn.outerOn === "undefined" && typeof $.fn.outerOff === "undefined")
   $.fn.outerOn = function() {
     var args = $(arguments).toArray();
     var _this = this;
-    var handleEvent = (args.shift() + [".outer" + "_" + _this.get(0).id].join());
+    var handleEvent = (args.shift() + [".outer" + "_" + _this.eq(0).prop("id")].join());
     var selector = "body";
 
     if (typeof args[0] !== "function") {
@@ -461,7 +461,7 @@ if (typeof $.fn.outerOn === "undefined" && typeof $.fn.outerOff === "undefined")
   $.fn.outerOff = function() {
     var args = $(arguments).toArray();
     var _this = this;
-    var handleEvent = (args.shift() + [".outer" + "_" + _this.get(0).id].join());
+    var handleEvent = (args.shift() + [".outer" + "_" + _this.eq(0).prop("id")].join());
     var selector = "body";
 
     if (typeof args[0] !== "undefined") {
