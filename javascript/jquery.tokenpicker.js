@@ -1,5 +1,5 @@
 /*!
- * jquery.tokenpicker v0.0.1
+ * jquery.tokenpicker v0.0.2
  *
  * Copyright (c) 2012 Takayuki Sugita, http://github.com/sugilog
  * Released under the MIT License
@@ -433,6 +433,8 @@ $.fn.tokenpicker = function(_options) {
   }
 
   tokenpickerWidget.build();
+  $(document).off("mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li");
+  $(document).off("click.tokenpicker", tokenpickerWidget.candidatesAreaId + " li");
   $(document).on("mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onMouseoverCandidates);
   $(document).on("click.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onClickCandidate);
   events.outerClick();
