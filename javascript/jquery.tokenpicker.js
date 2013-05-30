@@ -11,13 +11,14 @@ $.fn.tokenpicker = function(_options) {
   var _this = this;
   _options = _options ? _options : {};
   _options.placeholders = _options.placeholders ? _options.placeholders : {};
+  _options.images = _options.images ? _options.images : {};
 
   var _tokens = $(_options.tokens).map(function(_, _token) {
     var searchValues = $(_options.searchKeys).map(function(_, key) {
       return _token[ key ];
     }).toArray();
 
-    return { token: _token[ _options.tokenKey ], label: _token[ _options.labelKey ], search: searchValues, original: _token };
+    return { token: _token[ _options.tokenKey ], label: _token[ _options.labelKey ], search: searchValues, original: _token, image: _token[ _options.imageKey ] };
   });
 
   var tokenpickerItems = {
@@ -28,6 +29,12 @@ $.fn.tokenpicker = function(_options) {
       sort: (_options.placeholders.sort || "HERE"),
       start: (_options.placeholders.start || "Type to search..."),
       none: (_options.placeholders.none || "No Results.")
+    },
+    images: {
+      display: !!_options.images.display,
+      cached:  {},
+      width:   (_options.images.width  || 50),
+      height:  (_options.images.height || 50)
     },
     cssClass: {
       base:                 "tokenpicker_base",
@@ -60,6 +67,20 @@ $.fn.tokenpicker = function(_options) {
       this.frame();
       this.inputField();
       this.existingTokens();
+      this.cacheImage();
+    },
+    cacheImage: function() {
+      if (tokenpickerItems.images.display) {
+        $(tokenpickerItems.tokens).each(function(_, _token) {
+          if (typeof _token.image !== "undefined") {
+            var cache    = new Image();
+            cache.width  = tokenpickerItems.images.width;
+            cache.height = tokenpickerItems.images.height;
+            cache.src    = _token.image;
+            tokenpickerItems.images.cached[_token.token] = cache;
+          }
+        });
+      }
     },
     base: function() {
       $(_this)
@@ -197,11 +218,13 @@ $.fn.tokenpicker = function(_options) {
       }
 
       $(tokenCandidates).each(function(_, item){
-        $("<li>")
-          .data(item)
-          .addClass( tokenpickerItems.cssClass.tokenCandidates )
-          .text( item.label )
-          .appendTo(candidatesArea);
+        var candidate = $("<li>").data(item).addClass( tokenpickerItems.cssClass.tokenCandidates )
+
+        if (typeof tokenpickerItems.images.cached[item.token] !== "undefined") {
+          candidate.append($(tokenpickerItems.images.cached[item.token]).css({verticalAlign: "middle", marginRight: 10}));
+        }
+
+        candidate.append($("<span>").text(item.label)).appendTo(candidatesArea);
       });
     },
     pickedToken: {

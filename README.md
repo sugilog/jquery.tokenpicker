@@ -88,6 +88,22 @@ Options
   <dd>
     [String] placeholder text on no searched result. (default: 'No Results.' )
   </dd>
+  <dt>imageKey</dt>
+  <dd>
+    [String] key of tokens to use as display images ( like avator ).
+  </dd>
+  <dt>images.display</dt>
+  <dd>
+    [boolean] use images as avator.
+  </dd>
+  <dt>images.width</dt>
+  <dd>
+    [Number] image width. (default: 50)
+  </dd>
+  <dt>images.height</dt>
+  <dd>
+    [Number] image height. (default: 50)
+  </dd>
 </dl>
 
 example:
