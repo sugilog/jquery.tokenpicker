@@ -136,7 +136,7 @@ $.fn.tokenpicker = function(_options) {
         .appendTo( $(tokenpickerWidget.frameId) );
     },
     existingTokens: function() {
-      var temp,
+      var temp, _item,
           existingItems = {},
           existingTokens = $(_this).val().split( tokenpickerItems.tokenSeparator );
 
@@ -149,8 +149,9 @@ $.fn.tokenpicker = function(_options) {
       });
 
       $.each(existingTokens, function(_, token){
-        var item = existingItems[token];
-        tokenpickerWidget.token(item);
+        if (_item = existingItems[token]) {
+          tokenpickerWidget.token(_item);
+        }
       });
     },
     token: function(pickedItem) {
@@ -161,6 +162,7 @@ $.fn.tokenpicker = function(_options) {
         _data  = pickedItem;
       }
       else {
+        console.log(pickedItem);
         _label = pickedItem.data().label;
         _data  = pickedItem.data();
       }
