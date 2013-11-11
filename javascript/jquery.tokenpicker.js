@@ -162,7 +162,6 @@ $.fn.tokenpicker = function(_options) {
         _data  = pickedItem;
       }
       else {
-        console.log(pickedItem);
         _label = pickedItem.data().label;
         _data  = pickedItem.data();
       }
