@@ -136,11 +136,20 @@ $.fn.tokenpicker = function(_options) {
         .appendTo( $(tokenpickerWidget.frameId) );
     },
     existingTokens: function() {
-      var existingTokens = $(_this).val().split( tokenpickerItems.tokenSeparator );
-      var existingItems = $.grep(tokenpickerItems.tokens, function(item) {
+      var temp,
+          existingItems = {},
+          existingTokens = $(_this).val().split( tokenpickerItems.tokenSeparator );
+
+      temp = $.grep(tokenpickerItems.tokens, function(item) {
         return ( $.inArray(item.token.toString(), existingTokens) !== -1 );
+      })
+
+      $.each(temp, function(_, item) {
+        existingItems[item.token.toString()] = item;
       });
-      $.each(existingItems, function(_, item){
+
+      $.each(existingTokens, function(_, token){
+        var item = existingItems[token];
         tokenpickerWidget.token(item);
       });
     },
