@@ -8,7 +8,8 @@
   "use strict";
 
 jQuery.fn.tokenpicker = function( options ) {
-  var TOKENS, tokenpickerItems, tokenpickerWidget, events, searchUtil,
+  var TOKENS, GROUPS,
+      tokenpickerItems, tokenpickerWidget, events, searchUtil,
       self = jQuery( this ),
       REMOVE = "×";
 
@@ -28,6 +29,21 @@ jQuery.fn.tokenpicker = function( options ) {
       search:   searchValues,
       original: token,
       image:    token[ options.imageKey ]
+    };
+  });
+
+  GROUPS = jQuery.map( ( options.groups || [] ), function( group ) {
+    var searchValues = jQuery.map( options.searchKeys, function( key ) {
+      return group[ key ];
+    });
+
+    return {
+      token:    "group_" + group[ options.tokenKey ].join( "_" ),
+      tokens:   group[ options.tokenKey ] || [],
+      label:    group[ options.labelKey ],
+      search:   searchValues,
+      original: group,
+      image:    group[ options.imageKey ]
     };
   });
 
@@ -80,13 +96,13 @@ jQuery.fn.tokenpicker = function( options ) {
     },
     cacheImage: function() {
       if ( tokenpickerItems.images.display ) {
-        jQuery.each( TOKENS, function( _, token ) {
-          if ( typeof token.image !== "undefined" ) {
+        jQuery.each( TOKENS.concat( GROUPS ), function( _, item ) {
+          if ( typeof item.image !== "undefined" ) {
             var cache    = new Image();
             cache.width  = tokenpickerItems.images.width;
             cache.height = tokenpickerItems.images.height;
-            cache.src    = token.image;
-            tokenpickerItems.images.cached[ token.token ] = cache;
+            cache.src    = item.image;
+            tokenpickerItems.images.cached[ item.token ] = cache;
           }
         });
       }
@@ -150,7 +166,7 @@ jQuery.fn.tokenpicker = function( options ) {
           existingItems = {},
           existingTokens = self.val().split( tokenpickerItems.tokenSeparator );
 
-      temp = jQuery.grep( TOKENS, function( item ) {
+      temp = jQuery.grep( TOKENS.concat( GROUPS ), function( item ) {
         return ( jQuery.inArray( item.token.toString(), existingTokens ) > -1 );
       })
 
@@ -159,44 +175,65 @@ jQuery.fn.tokenpicker = function( options ) {
       });
 
       jQuery.each( existingTokens, function( _, token ) {
-        if ( _item = existingItems[token] ) {
+        if ( _item = existingItems[ token ] ) {
           tokenpickerWidget.token( _item );
         }
       });
     },
     token: function( pickedItem ) {
-      var label, data,
+      var label, datum, items, tmp, existingTokens,
           item = jQuery( "<li>" ),
           remover = jQuery( "<span>" );
 
       if ( jQuery.isPlainObject( pickedItem ) ) {
-        label = pickedItem.label;
-        data  = pickedItem;
+        datum = pickedItem;
       }
       else {
-        label = pickedItem.data().label;
-        data  = pickedItem.data();
+        datum  = pickedItem.data();
       }
 
-      label = jQuery( "<span>" ).text( label );
-      remover = jQuery("<span>")
-        .addClass( tokenpickerItems.cssClass.removeToken )
-        .text( REMOVE )
-        // EVENT: remove token item
-        .on( "click.tokenpicker", events.onRemoveToken );
+      if ( typeof datum.tokens !== "undefined" ) {
+        existingTokens = self.val().split( tokenpickerItems.tokenSeparator );
 
-      item
-        .addClass( tokenpickerItems.cssClass.tokenItems )
-        .addClass( tokenpickerItems.cssClass.pickedToken )
-        .data( data )
-        .append( label )
-        .append( remover );
+        datum = jQuery.map( datum.tokens, function( token ) {
+          // FIXME: performance
+          if ( jQuery.inArray( token.toString(), existingTokens ) === -1 ) {
+            return jQuery.grep( TOKENS, function( item ) {
+             return item.token.toString() === token.toString();
+            });
+          }
+        });
+      }
+      else {
+        datum = [ datum ];
+      }
 
-      jQuery( tokenpickerWidget.inputId )
-        .closest( "." + tokenpickerItems.cssClass.tokenItems )
-        .before( item );
+      items = jQuery.map( datum, function( data ) {
+        label = data.label;
 
-      return item;
+        label = jQuery( "<span>" ).text( label );
+        remover = jQuery("<span>")
+          .addClass( tokenpickerItems.cssClass.removeToken )
+          .text( REMOVE )
+          // EVENT: remove token item
+          .on( "click.tokenpicker", events.onRemoveToken );
+
+        tmp = item.clone( true )
+        tmp
+          .addClass( tokenpickerItems.cssClass.tokenItems )
+          .addClass( tokenpickerItems.cssClass.pickedToken )
+          .data( data )
+          .append( label )
+          .append( remover );
+
+        jQuery( tokenpickerWidget.inputId )
+          .closest( "." + tokenpickerItems.cssClass.tokenItems )
+          .before( tmp );
+
+        return tmp;
+      });
+
+      return items;
     },
     candidatesArea: function( tokenCandidates ) {
       var candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId );
@@ -258,7 +295,12 @@ jQuery.fn.tokenpicker = function( options ) {
         return ( jQuery( tokenpickerWidget.frameId ).find( "." + tokenpickerItems.cssClass.pickedToken ) || jQuery( undefined ) );
       },
       tokens: function() {
-        var tokens = tokenpickerWidget.pickedToken.items().map( function() { return jQuery( this ).data().token; } ).toArray();
+        var tokens = tokenpickerWidget.pickedToken.items().map(
+          function() {
+            return jQuery( this ).data().token;
+          }
+        ).toArray();
+
         return tokens || [];
       },
       setVal: function() {
@@ -395,11 +437,14 @@ jQuery.fn.tokenpicker = function( options ) {
       }
     },
     onPickToken: function( event ) {
-      var token,
+      var tokens,
           current = tokenpickerWidget.candidateItem.currentPick();
 
+      console.log( "onPickToken", current.data() );
+
       if ( current.length > 0 ) {
-        token = tokenpickerWidget.token( current );
+        tokens = tokenpickerWidget.token( current );
+        console.log( tokens );
         tokenpickerWidget.pickedToken.setVal();
       }
 
@@ -407,7 +452,7 @@ jQuery.fn.tokenpicker = function( options ) {
       events.afterCloseCandidates.apply( this, [ event ] );
 
       if ( current.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onPick ) ) {
-        tokenpickerItems.callback.onPick.apply( self, [ token ] );
+        tokenpickerItems.callback.onPick.apply( self, [ tokens ] );
       }
     },
     onRemoveToken: function( event ) {
@@ -450,7 +495,7 @@ jQuery.fn.tokenpicker = function( options ) {
     find: function( query ) {
       var that = this;
 
-      return jQuery.map( TOKENS, function( token ) {
+      return jQuery.map( TOKENS.concat( GROUPS ), function( token ) {
         // FIXME: find by Array
         if ( searchUtil.matchAll( query, token.search.join( "||" ) ) ) {
           return token;

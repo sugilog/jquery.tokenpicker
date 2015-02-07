@@ -26,18 +26,21 @@
   <script type="text/javascript">
   <!--
   jQuery("input[name=name_token]").tokenpicker({
-    onPick: function(item){
-      console.log("pick");
-      console.log(this);
-      console.log(item);
-      console.log(item.data());
+    onPick: function( items ){
+      console.log( "pick" );
+      console.log( this   );
+      console.log( items  );
+
+      jQuery.each( items, function( _, item ) {
+        console.log( item.data() );
+      });
     },
-    onRemove: function(item){
-      console.log("remove");
-      console.log(this);
-      console.log(item);
+    onRemove: function( items ){
+      console.log( "remove" );
+      console.log( this  );
+      console.log( items );
     },
-    onSort: function(items){
+    onSort: function( items ){
       console.log("sort");
       console.log(this);
       console.log(items);
@@ -98,6 +101,9 @@
       { id: 45, name: "宮崎県",   kana: "みやざきけん", en: "miyazaki",   image: "http://lorempixel.com/54/54" },
       { id: 46, name: "鹿児島県", kana: "かごしまけん", en: "kagoshima",  image: "http://lorempixel.com/54/55" },
       { id: 47, name: "沖縄県",   kana: "おきなわけん", en: "okinawa",    image: "http://lorempixel.com/54/56" }
+    ],
+    groups: [
+      { id: [ 40, 41, 42, 43, 44, 45, 46, 47 ], name: "九州", kana: "きゅうしゅう", en: "kyushu", image: "http://lorempixel.com/54/57" }
     ]
   });
   -->
