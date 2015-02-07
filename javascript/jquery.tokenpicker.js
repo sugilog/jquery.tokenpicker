@@ -5,6 +5,7 @@
  * Released under the MIT License
 */
 (function( jQuery ) {
+  "use strict";
 
 jQuery.fn.tokenpicker = function( options ) {
   var TOKENS, tokenpickerItems, tokenpickerWidget, events, searchUtil,
@@ -166,7 +167,7 @@ jQuery.fn.tokenpicker = function( options ) {
     token: function( pickedItem ) {
       var label, data,
           item = jQuery( "<li>" ),
-          removeer = jQuery( "<span>" );
+          remover = jQuery( "<span>" );
 
       if ( jQuery.isPlainObject( pickedItem ) ) {
         label = pickedItem.label;
