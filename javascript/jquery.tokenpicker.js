@@ -4,37 +4,45 @@
  * Copyright (c) 2012 Takayuki Sugita, http://github.com/sugilog
  * Released under the MIT License
 */
-(function($) {
+(function( jQuery ) {
 
-$.fn.tokenpicker = function(_options) {
-  // prepare
-  var _this = this;
-  _options = _options ? _options : {};
-  _options.placeholders = _options.placeholders ? _options.placeholders : {};
-  _options.images = _options.images ? _options.images : {};
+jQuery.fn.tokenpicker = function( options ) {
+  var TOKENS, tokenpickerItems, tokenpickerWidget, events, searchUtil,
+      self = jQuery( this ),
+      REMOVE = "×";
 
-  var _tokens = $(_options.tokens).map(function(_, _token) {
-    var searchValues = $(_options.searchKeys).map(function(_, key) {
-      return _token[ key ];
-    }).toArray();
+  options = jQuery.extend(
+    { placeholders: {}, images: {} },
+    options
+  );
 
-    return { token: _token[ _options.tokenKey ], label: _token[ _options.labelKey ], search: searchValues, original: _token, image: _token[ _options.imageKey ] };
+  TOKENS = jQuery.map( options.tokens, function( token ) {
+    var searchValues = jQuery.map( options.searchKeys, function( key ) {
+      return token[ key ];
+    });
+
+    return {
+      token:    token[ options.tokenKey ],
+      label:    token[ options.labelKey ],
+      search:   searchValues,
+      original: token,
+      image:    token[ options.imageKey ]
+    };
   });
 
-  var tokenpickerItems = {
-    baseName: $(_this).prop("name"),
-    tokens:   _tokens,
-    tokenSeparator: (_options.separator || ","),
-    placeholders: {
-      sort: (_options.placeholders.sort || "HERE"),
-      start: (_options.placeholders.start || "Type to search..."),
-      none: (_options.placeholders.none || "No Results.")
+  tokenpickerItems = {
+    baseName:       self.prop( "name" ),
+    tokenSeparator: ( options.separator || "," ),
+    placeholders:   {
+      sort:  ( options.placeholders.sort  || "HERE" ),
+      start: ( options.placeholders.start || "Type to search..." ),
+      none:  ( options.placeholders.none  || "No Results." )
     },
     images: {
-      display: !!_options.images.display,
+      display: !!options.images.display,
       cached:  {},
-      width:   (_options.images.width  || 50),
-      height:  (_options.images.height || 50)
+      width:   ( options.images.width  || 50 ),
+      height:  ( options.images.height || 50 )
     },
     cssClass: {
       base:                 "tokenpicker_base",
@@ -51,17 +59,17 @@ $.fn.tokenpicker = function(_options) {
       currentPick:          "tokenpicker_current_pick"
     },
     callback: {
-      onPick:   _options.onPick,
-      onRemove: _options.onRemove,
-      onSort:   _options.onSort
+      onPick:   options.onPick,
+      onRemove: options.onRemove,
+      onSort:   options.onSort
     }
   };
 
-  var tokenpickerWidget = {
-    baseId:  ("#tokenpicker_widget_base_"   + tokenpickerItems.baseName),
-    frameId: ("#tokenpicker_widget_frame_"  + tokenpickerItems.baseName),
-    inputId: ("#tokenpicker_widget_input_"  + tokenpickerItems.baseName),
-    candidatesAreaId: ("#tokenpicker_widget_candidatesArea_" + tokenpickerItems.baseName),
+  tokenpickerWidget = {
+    baseId:  ( "#tokenpicker_widget_base_"   + tokenpickerItems.baseName ),
+    frameId: ( "#tokenpicker_widget_frame_"  + tokenpickerItems.baseName ),
+    inputId: ( "#tokenpicker_widget_input_"  + tokenpickerItems.baseName ),
+    candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + tokenpickerItems.baseName ),
     build: function(){
       this.base();
       this.frame();
@@ -70,135 +78,137 @@ $.fn.tokenpicker = function(_options) {
       this.cacheImage();
     },
     cacheImage: function() {
-      if (tokenpickerItems.images.display) {
-        $(tokenpickerItems.tokens).each(function(_, _token) {
-          if (typeof _token.image !== "undefined") {
+      if ( tokenpickerItems.images.display ) {
+        jQuery.each( TOKENS, function( _, token ) {
+          if ( typeof token.image !== "undefined" ) {
             var cache    = new Image();
             cache.width  = tokenpickerItems.images.width;
             cache.height = tokenpickerItems.images.height;
-            cache.src    = _token.image;
-            tokenpickerItems.images.cached[_token.token] = cache;
+            cache.src    = token.image;
+            tokenpickerItems.images.cached[ token.token ] = cache;
           }
         });
       }
     },
     base: function() {
-      $(_this)
-        .wrap(
-          jQuery("<div>")
-            .prop({
-              id: tokenpickerWidget.baseId.replace("#", "")
-            })
-            .addClass(tokenpickerItems.cssClass.base)
-        )
-        .css({ display: 'none' });
+      var wrapper = jQuery( "<div>" );
+
+      wrapper
+        .addClass( tokenpickerItems.cssClass.base )
+        .prop( {
+          id: tokenpickerWidget.baseId.replace( "#", "" )
+        });
+
+      self.wrap( wrapper ).css( { display: 'none' } );
     },
     frame: function() {
-      $("<ul>")
-        .prop({
+      jQuery( "<ul>" )
+        .prop( {
           id: tokenpickerWidget.frameId.replace("#", "")
         })
         .addClass( tokenpickerItems.cssClass.frame )
         // EVENT: click in frame to focus
-        .on("click.tokenpicker", function() {
-          $(tokenpickerWidget.inputId).get(0).focus();
+        .on( "click.tokenpicker", function() {
+          jQuery(tokenpickerWidget.inputId).get(0).focus();
         })
         // EVENT: sort ( required jquery ui sortable; experimental )
-        .sortable({
+        .sortable( {
           placeholder: tokenpickerItems.cssClass.sortablePlaceholder,
           // EVENT: start sorting
           start: events.onSortableStart,
           // EVENT: end sorting
           update: events.onSortableUpdate
         })
-        .appendTo( $(tokenpickerWidget.baseId) );
+        .appendTo( jQuery( tokenpickerWidget.baseId ) );
     },
     inputField: function() {
-      var _input =
-        $("<input>")
-          .prop({
-            id:   tokenpickerWidget.inputId.replace("#", ""),
-            type: "text",
-            "autocomplete": "off"
-          })
-          .attr("autocomplete", "off")
-          .addClass( tokenpickerItems.cssClass.input )
-          // EVENT: observe inputing
-          .observeField(0.15, events.onInputSearchWord)
-          // EVENT: focus inputing
-          .on("focus.tokenpicker", events.onFocusInputField)
-          // EVENT: key control
-          .on("keydown.tokenpicker", events.onSelectTokenCandidates);
+      var input = jQuery("<input>");
 
-      $("<li>")
+      input
+        .prop({
+          id:   tokenpickerWidget.inputId.replace("#", ""),
+          type: "text",
+          "autocomplete": "off"
+        })
+        .attr( "autocomplete", "off" )
+        .addClass( tokenpickerItems.cssClass.input )
+        // EVENT: observe inputing
+        .observeField( 0.15, events.onInputSearchWord )
+        // EVENT: focus inputing
+        .on( "focus.tokenpicker", events.onFocusInputField )
+        // EVENT: key control
+        .on( "keydown.tokenpicker", events.onSelectTokenCandidates );
+
+      jQuery( "<li>" )
         .addClass( tokenpickerItems.cssClass.tokenItems )
-        .append( _input )
-        .appendTo( $(tokenpickerWidget.frameId) );
+        .append( input )
+        .appendTo( jQuery( tokenpickerWidget.frameId ) );
     },
     existingTokens: function() {
       var temp, _item,
           existingItems = {},
-          existingTokens = $(_this).val().split( tokenpickerItems.tokenSeparator );
+          existingTokens = self.val().split( tokenpickerItems.tokenSeparator );
 
-      temp = $.grep(tokenpickerItems.tokens, function(item) {
-        return ( $.inArray(item.token.toString(), existingTokens) !== -1 );
+      temp = jQuery.grep( TOKENS, function( item ) {
+        return ( jQuery.inArray( item.token.toString(), existingTokens ) > -1 );
       })
 
-      $.each(temp, function(_, item) {
-        existingItems[item.token.toString()] = item;
+      jQuery.each( temp, function( _, item ) {
+        existingItems[ item.token.toString() ] = item;
       });
 
-      $.each(existingTokens, function(_, token){
-        if (_item = existingItems[token]) {
-          tokenpickerWidget.token(_item);
+      jQuery.each( existingTokens, function( _, token ) {
+        if ( _item = existingItems[token] ) {
+          tokenpickerWidget.token( _item );
         }
       });
     },
-    token: function(pickedItem) {
-      var _label, _data;
+    token: function( pickedItem ) {
+      var label, data,
+          item = jQuery( "<li>" ),
+          removeer = jQuery( "<span>" );
 
-      if ($.isPlainObject(pickedItem)) {
-        _label = pickedItem.label;
-        _data  = pickedItem;
+      if ( jQuery.isPlainObject( pickedItem ) ) {
+        label = pickedItem.label;
+        data  = pickedItem;
       }
       else {
-        _label = pickedItem.data().label;
-        _data  = pickedItem.data();
+        label = pickedItem.data().label;
+        data  = pickedItem.data();
       }
 
-      var item =
-        $("<li>")
-          .addClass( tokenpickerItems.cssClass.tokenItems )
-          .addClass( tokenpickerItems.cssClass.pickedToken )
-          .data( _data )
-          .append(
-            $("<span>")
-              .text( _label )
-          )
-          .append(
-            $("<span>")
-              .addClass( tokenpickerItems.cssClass.removeToken )
-              .text( "×" )
-              // EVENT: remove token item
-              .on("click.tokenpicker", events.onRemoveToken)
-          )
-      $(tokenpickerWidget.inputId)
-        .closest("." + tokenpickerItems.cssClass.tokenItems)
-        .before(item);
+      label = jQuery( "<span>" ).text( label );
+      remover = jQuery("<span>")
+        .addClass( tokenpickerItems.cssClass.removeToken )
+        .text( REMOVE )
+        // EVENT: remove token item
+        .on( "click.tokenpicker", events.onRemoveToken );
+
+      item
+        .addClass( tokenpickerItems.cssClass.tokenItems )
+        .addClass( tokenpickerItems.cssClass.pickedToken )
+        .data( data )
+        .append( label )
+        .append( remover );
+
+      jQuery( tokenpickerWidget.inputId )
+        .closest( "." + tokenpickerItems.cssClass.tokenItems )
+        .before( item );
 
       return item;
     },
-    candidatesArea: function(tokenCandidates) {
-      var candidatesArea = $(tokenpickerWidget.candidatesAreaId);
+    candidatesArea: function( tokenCandidates ) {
+      var candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId );
 
       if ( candidatesArea.length === 0 ) {
         candidatesArea =
-          $("<ul>")
-            .prop({
-              id: tokenpickerWidget.candidatesAreaId.replace("#", "")
+          jQuery( "<ul>" )
+            .prop( {
+              id: tokenpickerWidget.candidatesAreaId.replace( "#", "" )
             })
             .addClass( tokenpickerItems.cssClass.candidatesArea )
-        candidatesArea.appendTo( $(tokenpickerWidget.baseId) );
+
+        candidatesArea.appendTo( jQuery( tokenpickerWidget.baseId ) );
       }
       else {
         candidatesArea.children().remove();
@@ -206,66 +216,66 @@ $.fn.tokenpicker = function(_options) {
         candidatesArea.removeClass( tokenpickerItems.cssClass.notFound );
       }
 
-      if (typeof tokenCandidates !== "undefined") {
+      if ( typeof tokenCandidates !== "undefined" ) {
         var pickedTokens = tokenpickerWidget.pickedToken.tokens();
-        tokenCandidates = $(tokenCandidates).map(function(_, item) {
-          if ( $.inArray(item.token, pickedTokens) === -1 ) {
+
+        tokenCandidates = jQuery( tokenCandidates ).map(function( _, item ) {
+          if ( jQuery.inArray( item.token, pickedTokens ) === -1 ) {
             return item;
           }
         });
       }
 
       if (typeof tokenCandidates === "undefined") {
-        tokenCandidates = [{token: undefined, label: tokenpickerItems.placeholders.start}]
+        tokenCandidates = [ { token: undefined, label: tokenpickerItems.placeholders.start } ];
         candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
       }
-      else if (tokenCandidates.length === 0) {
-        tokenCandidates = [{token: undefined, label: tokenpickerItems.placeholders.none}]
+      else if ( tokenCandidates.length === 0 ) {
+        tokenCandidates = [ { token: undefined, label: tokenpickerItems.placeholders.none } ];
         candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
       }
       else {
         candidatesArea.addClass( tokenpickerItems.cssClass.found );
       }
 
-      $(tokenCandidates).each(function(_, item){
-        var candidate = $("<li>").data(item).addClass( tokenpickerItems.cssClass.tokenCandidates )
+      jQuery( tokenCandidates ).each(function( _, item ){
+        var candidate = jQuery("<li>").data(item).addClass( tokenpickerItems.cssClass.tokenCandidates );
 
-        if (typeof tokenpickerItems.images.cached[item.token] !== "undefined") {
-          candidate.append($(tokenpickerItems.images.cached[item.token]).css({verticalAlign: "middle", marginRight: 10}));
+        if ( typeof tokenpickerItems.images.cached[ item.token ] !== "undefined" ) {
+          candidate.append(
+            jQuery( tokenpickerItems.images.cached[ item.token ] ).css( { verticalAlign: "middle", marginRight: 10 } )
+          );
         }
 
-        candidate.append($("<span>").text(item.label)).appendTo(candidatesArea);
+        candidate
+          .append( jQuery( "<span>" ).text( item.label ) )
+          .appendTo( candidatesArea );
       });
     },
     pickedToken: {
       items: function() {
-        return ( $(tokenpickerWidget.frameId).find("." + tokenpickerItems.cssClass.pickedToken) || $(undefined) );
+        return ( jQuery( tokenpickerWidget.frameId ).find( "." + tokenpickerItems.cssClass.pickedToken ) || jQuery( undefined ) );
       },
       tokens: function() {
-        var _tokens =
-          tokenpickerWidget.pickedToken.items()
-            .map(function(){
-              return $(this).data().token;
-            })
-            .toArray();
-        return _tokens || [];
+        var tokens = tokenpickerWidget.pickedToken.items().map( function() { return jQuery( this ).data().token; } ).toArray();
+        return tokens || [];
       },
       setVal: function() {
         var pickedTokens = tokenpickerWidget.pickedToken.tokens();
-        $(_this).val(pickedTokens.join( tokenpickerItems.tokenSeparator ));
+        self.val(pickedTokens.join( tokenpickerItems.tokenSeparator ));
       }
     },
     candidateItem: {
-      setCurrentPick: function(target) {
-        $(target).siblings().removeClass(tokenpickerItems.cssClass.currentPick);
-        $(target).addClass(tokenpickerItems.cssClass.currentPick);
+      setCurrentPick: function( target ) {
+        jQuery( target ).siblings().removeClass( tokenpickerItems.cssClass.currentPick );
+        jQuery( target ).addClass( tokenpickerItems.cssClass.currentPick );
       },
       currentPick: function() {
-        var candidatesArea = $(tokenpickerWidget.candidatesAreaId);
-        var current = jQuery(undefined);
+        var candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId ),
+            current = jQuery( undefined );
 
-        if (candidatesArea.hasClass(tokenpickerItems.cssClass.found)) {
-          current = candidatesArea.find("." + tokenpickerItems.cssClass.currentPick);
+        if ( candidatesArea.hasClass( tokenpickerItems.cssClass.found ) ) {
+          current = candidatesArea.find( "." + tokenpickerItems.cssClass.currentPick );
         }
 
         return current;
@@ -279,51 +289,53 @@ $.fn.tokenpicker = function(_options) {
         return current.prev();
       }
     }
-  }
+  };
 
-  var events = {
-    onCloseCandidates: function(_event) {
+  events = {
+    onCloseCandidates: function( event ) {
       var base;
 
-      if ( $(this).hasClass(tokenpickerItems.cssClass.base) ) {
-        base = this;
+      if ( jQuery( this ).hasClass( tokenpickerItems.cssClass.base ) ) {
+        base = jQuery( this );
       }
       else {
-        base = $(this).closest("." + tokenpickerItems.cssClass.base);
+        base = jQuery( this ).closest( "." + tokenpickerItems.cssClass.base );
       }
 
-      $(base).find("." + tokenpickerItems.cssClass.input).val("");
-      $(base).find("." + tokenpickerItems.cssClass.candidatesArea).remove();
+      base.find( "." + tokenpickerItems.cssClass.input ).val( "" );
+      base.find( "." + tokenpickerItems.cssClass.candidatesArea ).remove();
     },
-    afterCloseCandidates: function(_event) {
-      $(tokenpickerWidget.inputId).get(0).focus();
+    afterCloseCandidates: function( event ) {
+      jQuery( tokenpickerWidget.inputId ).get( 0 ).focus();
     },
-    onFocusInputField: function(_event) {
+    onFocusInputField: function( event ) {
       tokenpickerWidget.candidatesArea();
     },
-    onInputSearchWord: function(_event) {
-      if ($(this).val() === "") {
-        events.onCloseCandidates.apply(this, [_event]);
-        events.afterCloseCandidates.apply(this, [_event]);
+    onInputSearchWord: function( event ) {
+      if ( jQuery( this ).val() === "" ) {
+        events.onCloseCandidates.apply( this, [ event ] );
+        events.afterCloseCandidates.apply( this, [ event ] );
       }
       else {
-        var result = searchUtil.exec(this);
-        tokenpickerWidget.candidatesArea(result);
-        var candidatesArea = $(tokenpickerWidget.candidatesAreaId);
+        var result,
+            candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId );
 
-        if ( candidatesArea.hasClass(tokenpickerItems.cssClass.found) ) {
-          tokenpickerWidget.candidateItem.setCurrentPick(candidatesArea.children().eq(0));
+        result = searchUtil.exec( this );
+        tokenpickerWidget.candidatesArea( result );
+
+        if ( candidatesArea.hasClass( tokenpickerItems.cssClass.found ) ) {
+          tokenpickerWidget.candidateItem.setCurrentPick( candidatesArea.children().eq( 0 ) );
         }
       }
     },
-    onMouseoverCandidates: function(_event) {
-      tokenpickerWidget.candidateItem.setCurrentPick(this);
+    onMouseoverCandidates: function( event ) {
+      tokenpickerWidget.candidateItem.setCurrentPick( this );
     },
     onClickCandidate: function(_event) {
-      tokenpickerWidget.candidateItem.setCurrentPick(this);
-      events.onPickToken.apply(this, [_event]);
+      tokenpickerWidget.candidateItem.setCurrentPick( this );
+      events.onPickToken.apply( this, [ event ] );
     },
-    onSelectTokenCandidates: function(_event) {
+    onSelectTokenCandidates: function( event ) {
       // delete   :  8
       // enter    : 13
       // up       : 38
@@ -332,194 +344,195 @@ $.fn.tokenpicker = function(_options) {
       // right    : 39
       // backspace: 46
 
-      switch(_event.keyCode.toString()) {
-        case "13":
-          events.onPickToken.apply(this, [_event]);
-          return false;
-        case "38":
-        case "40":
-          var target = tokenpickerWidget.candidateItem[ (_event.keyCode.toString() === "38") ? "prev" : "next" ]();
+      switch( event.keyCode.toString() ) {
+      case "13":
+        events.onPickToken.apply( this, [ event ] );
+        return false;
+      case "38":
+      case "40":
+        var target = tokenpickerWidget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]();
 
-          if (target.length > 0) {
-            tokenpickerWidget.candidateItem.setCurrentPick(target)
-          }
+        if ( target.length > 0 ) {
+          tokenpickerWidget.candidateItem.setCurrentPick( target );
+        }
 
+        break;
+      case "37":
+      case "39":
+        if ( jQuery( tokenpickerWidget.inputId ).val() !== "" ) {
           break;
-        case "37":
-        case "39":
-          if ($(tokenpickerWidget.inputId).val() !== "") {
-            break;
-          }
+        }
 
-          var selector, append;
+        var selector, append;
 
-          if (_event.keyCode.toString() === "37") {
-            selector = "prev";
-            append   = "before";
-          }
-          else {
-            selector = "next";
-            append   = "after";
-          }
+        if ( event.keyCode.toString() === "37" ) {
+          selector = "prev";
+          append   = "before";
+        }
+        else {
+          selector = "next";
+          append   = "after";
+        }
 
-          var target = $(tokenpickerWidget.inputId).closest("li")[selector]();
-          target[append]( $(tokenpickerWidget.inputId).closest("li") );
+        var target = jQuery( tokenpickerWidget.inputId ).closest( "li" )[ selector ]();
+        target[ append ]( jQuery( tokenpickerWidget.inputId ).closest( "li" ) );
 
-          setTimeout(function(){
-            $(tokenpickerWidget.inputId).get(0).focus();
-          }, 30);
+        setTimeout( function() {
+          jQuery( tokenpickerWidget.inputId ).get( 0 ).focus();
+        }, 30 );
 
+        break;
+      case  "8":
+      case "46":
+        if ( jQuery( tokenpickerWidget.inputId ).val() !== "" ) {
           break;
-        case  "8":
-        case "46":
-          if ($(tokenpickerWidget.inputId).val() !== "") {
-            break;
-          }
+        }
 
-          var target = $(tokenpickerWidget.inputId).closest("li")[ _event.keyCode.toString() === "8" ? "prev" : "next" ]();
-          events.onRemoveToken.apply(target, [_event]);
-          break;
+        var target = jQuery( tokenpickerWidget.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
+        events.onRemoveToken.apply( target, [ event ] );
+        break;
       }
     },
-    onPickToken: function(_event) {
-      var current = tokenpickerWidget.candidateItem.currentPick();
-      var _token;
+    onPickToken: function( event ) {
+      var token,
+          current = tokenpickerWidget.candidateItem.currentPick();
 
-      if (current.length > 0) {
-        _token = tokenpickerWidget.token(current);
+      if ( current.length > 0 ) {
+        token = tokenpickerWidget.token( current );
         tokenpickerWidget.pickedToken.setVal();
       }
 
-      events.onCloseCandidates.apply(this, [_event]);
-      events.afterCloseCandidates.apply(this, [_event]);
+      events.onCloseCandidates.apply( this, [ event ] );
+      events.afterCloseCandidates.apply( this, [ event ] );
 
-      if (current.length > 0 && $.isFunction( tokenpickerItems.callback.onPick )) {
-        tokenpickerItems.callback.onPick.apply(_this, [_token]);
+      if ( current.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onPick ) ) {
+        tokenpickerItems.callback.onPick.apply( self, [ token ] );
       }
     },
-    onRemoveToken: function(_event) {
-      var _token = $(this).closest( "." + tokenpickerItems.cssClass.pickedToken );
-      var _data = _token.data();
-      _token.remove();
+    onRemoveToken: function( event ) {
+      var token = jQuery( this ).closest( "." + tokenpickerItems.cssClass.pickedToken ),
+          data  = token.data();
+
+      token.remove();
       tokenpickerWidget.pickedToken.setVal();
 
-      if (_token.length > 0 && $.isFunction( tokenpickerItems.callback.onRemove )) {
-        tokenpickerItems.callback.onRemove.apply(_this, [_data]);
+      if ( token.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onRemove ) ) {
+        tokenpickerItems.callback.onRemove.apply( self, [ data ] );
       }
     },
     outerClick: function() {
-      $("." + tokenpickerItems.cssClass.base).outerOff("click.tokenpicker");
+      jQuery( "." + tokenpickerItems.cssClass.base ).outerOff( "click.tokenpicker" );
       // EVENT: hide on click out of widget
-      $("." + tokenpickerItems.cssClass.base).outerOn("click.tokenpicker", function(_event){
-        $(this).each(function(){
-          events.onCloseCandidates.apply(this, [_event]);
+      jQuery( "." + tokenpickerItems.cssClass.base ).outerOn( "click.tokenpicker", function( event ) {
+        jQuery( this ).each( function() {
+          events.onCloseCandidates.apply( this, [ event ] );
         });
       });
     },
-    onSortableStart: function(_event, ui) {
-      $("." + tokenpickerItems.cssClass.sortablePlaceholder).text( tokenpickerItems.placeholders.sort );
+    onSortableStart: function( event, ui ) {
+      jQuery( "." + tokenpickerItems.cssClass.sortablePlaceholder ).text( tokenpickerItems.placeholders.sort );
     },
-    onSortableUpdate: function(_event, ui) {
+    onSortableUpdate: function( event, ui ) {
       tokenpickerWidget.pickedToken.setVal();
 
-      if ($.isFunction( tokenpickerItems.callback.onSort )) {
-        tokenpickerItems.callback.onSort.apply(_this, [tokenpickerWidget.pickedToken.items()]);
+      if ( jQuery.isFunction( tokenpickerItems.callback.onSort ) ) {
+        tokenpickerItems.callback.onSort.apply( self, [ tokenpickerWidget.pickedToken.items() ] );
       }
     }
-  }
+  };
 
   // share with selectpicker
-  var searchUtil = {
-    exec: function(_input) {
-      return searchUtil.find( $(_input).val() || "" );
+  searchUtil = {
+    exec: function( input ) {
+      return searchUtil.find( jQuery( input ).val() || "" );
     },
-    find: function(query) {
+    find: function( query ) {
       var that = this;
 
-      return $(tokenpickerItems.tokens).map(function(_, _token){
+      return jQuery.map( TOKENS, function( token ) {
         // FIXME: find by Array
-        if (searchUtil.matchAll(query, _token.search.join("||"))) {
-          return _token;
+        if ( searchUtil.matchAll( query, token.search.join( "||" ) ) ) {
+          return token;
         }
-      }).toArray();
+      });
     },
-    matchAll: function(query, sequence) {
-      var regexes = [/.*/];
+    matchAll: function( query, sequence ) {
+      var regexes = [ /.*/ ];
 
-      if (query.length > 0) {
-        regexes = $(query.split(/(?:\s|　)/)).map(function(idx, val){
-          return new RegExp(val, "i")
-        }).toArray();
+      if ( query.length > 0) {
+        regexes = jQuery.map( query.split( /(?:\s|　)/ ), function( val ) {
+          return new RegExp( val, "i" )
+        });
       }
 
       var result = true
 
-      $.each(regexes, function(_, regex) {
-        if (!regex.test(sequence)) {
+      jQuery.each( regexes, function( _, regex ) {
+        if ( !regex.test( sequence ) ) {
           result = false
           return
         }
-      })
+      });
 
       return result;
     }
-  }
+  };
 
   tokenpickerWidget.build();
-  $(document).off("mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li");
-  $(document).off("click.tokenpicker", tokenpickerWidget.candidatesAreaId + " li");
-  $(document).on("mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onMouseoverCandidates);
-  $(document).on("click.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onClickCandidate);
+  jQuery( document ).off( "mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li" );
+  jQuery( document ).off( "click.tokenpicker",     tokenpickerWidget.candidatesAreaId + " li" );
+  jQuery( document ).on(  "mouseover.tokenpicker", tokenpickerWidget.candidatesAreaId + " li", events.onMouseoverCandidates );
+  jQuery( document ).on(  "click.tokenpicker",     tokenpickerWidget.candidatesAreaId + " li", events.onClickCandidate );
   events.outerClick();
 }
 
-if (typeof $.fn.outerOn === "undefined" && typeof $.fn.outerOff === "undefined") {
-  $.fn.outerOn = function() {
-    var args = $(arguments).toArray();
-    var _this = this;
-    var handleEvent = (args.shift() + [".outer" + "_" + _this.eq(0).prop("id")].join());
-    var selector = "body";
+if (typeof jQuery.fn.outerOn === "undefined" && typeof jQuery.fn.outerOff === "undefined") {
+  jQuery.fn.outerOn = function() {
+    var args = jQuery( arguments ).toArray(),
+        self = this,
+        handleEvent = ( args.shift() + [ ".outer" + "_" + self.eq( 0 ).prop( "id" ) ].join() ),
+        selector    = "body";
 
-    if (typeof args[0] !== "function") {
+    if ( typeof args[ 0 ] !== "function" ) {
       selector = args.shift();
     }
 
     var callback = args.shift();
 
-    $(selector).on(handleEvent, function(_event) {
-      if ($(_event.target).closest(_this).length === 0) {
-        callback.apply(_this, [_event]);
+    jQuery( selector ).on( handleEvent, function( event ) {
+      if ( jQuery( event.target ).closest( self ).length === 0 ) {
+        callback.apply( self, [ event ] );
       }
     });
   };
 
-  $.fn.outerOff = function() {
-    var args = $(arguments).toArray();
-    var _this = this;
-    var handleEvent = (args.shift() + [".outer" + "_" + _this.eq(0).prop("id")].join());
-    var selector = "body";
+  jQuery.fn.outerOff = function() {
+    var args = jQuery(arguments).toArray(),
+        self = this,
+        handleEvent = ( args.shift() + [ ".outer" + "_" + self.eq( 0 ).prop( "id" ) ].join() ),
+        selector    = "body";
 
-    if (typeof args[0] !== "undefined") {
+    if ( typeof args[0] !== "undefined" ) {
       selector = args.shift();
     }
 
-    $(selector).off(handleEvent);
+    jQuery( selector ).off( handleEvent );
   }
 }
 
-if (typeof $.fn.observeField === "undefined") {
+if (typeof jQuery.fn.observeField === "undefined") {
   // jquery.observe_field
   // https://github.com/splendeo/jquery.observe_field
-  $.fn.observeField = function(frequency, callback) {
+  jQuery.fn.observeField = function(frequency, callback) {
     frequency = frequency * 1000; // translate to milliseconds
     return this.each(function(){
-      var _this = $(this);
-      var prev = _this.val();
+      var self = jQuery(this);
+      var prev = self.val();
       var check = function() {
-        var val = _this.val();
+        var val = self.val();
         if(prev != val){
           prev = val;
-          _this.map(callback); // invokes the callback on $this
+          self.map(callback); // invokes the callback on jQuery this
         }
       };
       var reset = function() {
@@ -531,9 +544,9 @@ if (typeof $.fn.observeField === "undefined") {
       check();
       var ti = setInterval(check, frequency); // invoke check periodically
       // reset counter after user interaction
-      _this.bind('keyup click mousemove', reset); //mousemove is for selects
+      self.bind('keyup click mousemove', reset); //mousemove is for selects
     });
   };
 }
 
-})(jQuery);
+})( jQuery );
