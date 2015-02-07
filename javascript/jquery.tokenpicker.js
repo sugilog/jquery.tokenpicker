@@ -63,7 +63,8 @@ jQuery.fn.tokenpicker = function( options ) {
     },
     cssClass: {
       base:                 "tokenpicker_base",
-      frame:                "tokenpicker_frame",
+      frame:                options.clearButton ? "tokenpicker_frame_with_clear" : "tokenpicker_frame",
+      clearButton:          "tokenpicker_clear_token",
       tokenItems:           "tokenpicker_frame_items",
       pickedToken:          "tokenpicker_frame_picked_token",
       sortablePlaceholder : "tokenpicker_frame_sortable_placeholder",
@@ -78,14 +79,16 @@ jQuery.fn.tokenpicker = function( options ) {
     callback: {
       onPick:   options.onPick,
       onRemove: options.onRemove,
-      onSort:   options.onSort
+      onSort:   options.onSort,
+      onClear:  options.onClear
     }
   };
 
   tokenpickerWidget = {
-    baseId:  ( "#tokenpicker_widget_base_"   + tokenpickerItems.baseName ),
-    frameId: ( "#tokenpicker_widget_frame_"  + tokenpickerItems.baseName ),
-    inputId: ( "#tokenpicker_widget_input_"  + tokenpickerItems.baseName ),
+    baseId:        ( "#tokenpicker_widget_base_"   + tokenpickerItems.baseName ),
+    frameId:       ( "#tokenpicker_widget_frame_"  + tokenpickerItems.baseName ),
+    inputId:       ( "#tokenpicker_widget_input_"  + tokenpickerItems.baseName ),
+    clearButtonId: ( "#tokenpicker_widget_clear_"  + tokenpickerItems.baseName ),
     candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + tokenpickerItems.baseName ),
     build: function(){
       this.base();
@@ -121,7 +124,7 @@ jQuery.fn.tokenpicker = function( options ) {
     frame: function() {
       jQuery( "<ul>" )
         .prop( {
-          id: tokenpickerWidget.frameId.replace("#", "")
+          id: tokenpickerWidget.frameId.replace( "#", "" )
         })
         .addClass( tokenpickerItems.cssClass.frame )
         // EVENT: click in frame to focus
@@ -137,6 +140,17 @@ jQuery.fn.tokenpicker = function( options ) {
           update: events.onSortableUpdate
         })
         .appendTo( jQuery( tokenpickerWidget.baseId ) );
+
+      if ( options.clearButton ) {
+        jQuery( "<span>" )
+          .prop( {
+            id: tokenpickerWidget.clearButtonId.replace( "#", "" )
+          })
+          .addClass( tokenpickerItems.cssClass.clearButton )
+          .text( REMOVE )
+          .on( "click.tokenpicker", events.onClearToken )
+          .appendTo( jQuery( tokenpickerWidget.baseId ) );
+      }
     },
     inputField: function() {
       var input = jQuery("<input>");
@@ -440,11 +454,8 @@ jQuery.fn.tokenpicker = function( options ) {
       var tokens,
           current = tokenpickerWidget.candidateItem.currentPick();
 
-      console.log( "onPickToken", current.data() );
-
       if ( current.length > 0 ) {
         tokens = tokenpickerWidget.token( current );
-        console.log( tokens );
         tokenpickerWidget.pickedToken.setVal();
       }
 
@@ -464,6 +475,22 @@ jQuery.fn.tokenpicker = function( options ) {
 
       if ( token.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onRemove ) ) {
         tokenpickerItems.callback.onRemove.apply( self, [ data ] );
+      }
+    },
+    onClearToken: function( event ) {
+      var data,
+          tokens = jQuery( tokenpickerWidget.frameId )
+            .find( "." + tokenpickerItems.cssClass.pickedToken );
+
+      data = tokens.map( function() {
+        return jQuery( this ).data();
+      }).toArray();
+
+      tokens.remove();
+      tokenpickerWidget.pickedToken.setVal();
+
+      if ( tokens.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onClear ) ) {
+        tokenpickerItems.callback.onClear.apply( self, [ data ] );
       }
     },
     outerClick: function() {

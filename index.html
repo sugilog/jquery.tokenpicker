@@ -35,15 +35,20 @@
         console.log( item.data() );
       });
     },
-    onRemove: function( items ){
+    onRemove: function( item ){
       console.log( "remove" );
+      console.log( this );
+      console.log( item );
+    },
+    onSort: function( items ){
+      console.log( "sort" );
       console.log( this  );
       console.log( items );
     },
-    onSort: function( items ){
-      console.log("sort");
-      console.log(this);
-      console.log(items);
+    onClear: function( items ){
+      console.log( "clear" );
+      console.log( this  );
+      console.log( items );
     },
     searchKeys: [ 'name', 'kana', 'en' ],
     labelKey:   'name',
@@ -53,6 +58,7 @@
       display: true
     },
     separator:  ',',
+    clearButton: true,
     tokens: [
       { id:  1, name: "北海道",   kana: "ほっかいどう", en: "hokkaido",   image: "http://lorempixel.com/50/50" },
       { id:  2, name: "青森県",   kana: "あおもりけん", en: "aomori",     image: "http://lorempixel.com/50/51" },
@@ -119,14 +125,14 @@
   <script type="text/javascript">
   <!--
   jQuery("input[name=prefecture_token]").tokenpicker({
-    onPick: function(item){
-      console.log("pick");
+    onPick: function( items ) {
+      console.log( "pick" );
     },
-    onRemove: function(item){
+    onRemove: function( item ) {
       console.log("remove");
     },
-    onSort: function(items){
-      console.log("sort");
+    onSort: function( items ) {
+      console.log( "sort" );
     },
     searchKeys: [ 'name', 'kana', 'en' ],
     labelKey:   'kana',
