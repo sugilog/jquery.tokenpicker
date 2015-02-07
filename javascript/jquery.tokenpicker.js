@@ -68,6 +68,7 @@ jQuery.fn.tokenpicker = function( options ) {
       tokenItems:           "tokenpicker_frame_items",
       pickedToken:          "tokenpicker_frame_picked_token",
       sortablePlaceholder : "tokenpicker_frame_sortable_placeholder",
+      inputContainer:       "tokenpicker_frame_input_container",
       input:                "tokenpicker_input",
       removeToken:          "tokenpicker_remove_token",
       candidatesArea:       "tokenpicker_candidates_area",
@@ -172,6 +173,7 @@ jQuery.fn.tokenpicker = function( options ) {
 
       jQuery( "<li>" )
         .addClass( tokenpickerItems.cssClass.tokenItems )
+        .addClass( tokenpickerItems.cssClass.inputContainer )
         .append( input )
         .appendTo( jQuery( tokenpickerWidget.frameId ) );
     },

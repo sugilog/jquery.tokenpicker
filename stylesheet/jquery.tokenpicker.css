@@ -33,7 +33,8 @@
   color: #666666;
   font-family: sans-serif;
 }
-.tokenpicker_frame_picked_token
+.tokenpicker_frame_picked_token,
+.tokenpicker_frame_input_container
 {
   margin: 3px;
   padding: 2px 3px;
@@ -41,7 +42,9 @@
 
   overflow: hidden;
   white-space: nowrap;
-
+}
+.tokenpicker_frame_picked_token
+{
   background-color: #eff2f7;
   border: 1px solid #ccd5e4;
   border-radius: 5px 5px 5px 5px;
@@ -123,6 +126,8 @@
 .tokenpicker_clear_token
 {
   position: absolute;
-  top:   5px;
+  top:   0px;
   right: 5px;
+  margin-top: 5px;
+  bottom: 0px;
 }
