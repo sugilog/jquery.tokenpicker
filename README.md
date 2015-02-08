@@ -76,6 +76,10 @@ Options
   <dd>
     [Arrayed Hashes][required] search tokens by hash
   </dd>
+  <dt>groups</dt>
+    [Arrayed Hashes][required] groups of search tokens by hash
+  <dd>
+  </dd>
   <dt>searchKeys</dt>
   <dd>
     [Arrayed Strings][required] keys of tokens to use as search value.
