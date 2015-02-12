@@ -390,7 +390,7 @@ jQuery.fn.tokenpicker = function( options ) {
     onMouseoverCandidates: function( event ) {
       tokenpickerWidget.candidateItem.setCurrentPick( this );
     },
-    onClickCandidate: function(_event) {
+    onClickCandidate: function( event ) {
       tokenpickerWidget.candidateItem.setCurrentPick( this );
       events.onPickToken.apply( this, [ event ] );
     },
