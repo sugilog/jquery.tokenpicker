@@ -1,4 +1,4 @@
-jQuery.tokenpicker.configure = function( object, options ) {
+jQuery.tokenpicker.configure = function( context, options ) {
   var name,
       config = {},
 
@@ -7,10 +7,10 @@ jQuery.tokenpicker.configure = function( object, options ) {
     options
   );
 
-  name          = jQuery.tokenpicker.config.objectName( object );
-  config.tokens = jQuery.tokenpicker.config.tokens( object, options );
-  config.groups = jQuery.tokenpicker.config.groups( object, options );
-  config.items  = jQuery.tokenpicker.config.items(  object, options );
+  name          = jQuery.tokenpicker.config.contextName( context );
+  config.tokens = jQuery.tokenpicker.config.tokens( context, options );
+  config.groups = jQuery.tokenpicker.config.groups( context, options );
+  config.items  = jQuery.tokenpicker.config.items(  context, options );
 
   jQuery.tokenpicker.config.configs = jQuery.extend(
     {},
@@ -20,18 +20,18 @@ jQuery.tokenpicker.configure = function( object, options ) {
   jQuery.tokenpicker.config.configs[ name ] = config;
 };
 
-jQuery.tokenpicker.config = function( object ) {
-  var name = jQuery.tokenpicker.config.objectName( object );
+jQuery.tokenpicker.config = function( context ) {
+  var name = jQuery.tokenpicker.config.contextName( context );
   return jQuery.tokenpicker.config.configs[ name ];
 };
 
 jQuery.extend(
   jQuery.tokenpicker.config,
   {
-    objectName: function( object ) {
-      return object.prop( "name" );
+    contextName: function( context ) {
+      return context.prop( "name" );
     },
-    tokens: function( object, options ) {
+    tokens: function( context, options ) {
       return jQuery.map( options.tokens, function( token ) {
         var searchValues = jQuery.map( options.searchKeys, function( key ) {
           return token[ key ];
@@ -46,7 +46,7 @@ jQuery.extend(
         };
       });
     },
-    groups: function( object, options ) {
+    groups: function( context, options ) {
       return jQuery.map( ( options.groups || [] ), function( group ) {
         var searchValues = jQuery.map( options.searchKeys, function( key ) {
           return group[ key ];
@@ -62,9 +62,9 @@ jQuery.extend(
         };
       });
     },
-    items: function( object, options ) {
+    items: function( context, options ) {
       return {
-        baseName:       jQuery.tokenpicker.config.objectName( object ),
+        baseName:       jQuery.tokenpicker.config.contextName( context ),
         tokenSeparator: ( options.separator || "," ),
         placeholders:   {
           sort:  ( options.placeholders.sort  || "HERE" ),

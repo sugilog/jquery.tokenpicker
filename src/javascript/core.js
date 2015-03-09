@@ -1,10 +1,10 @@
 jQuery.fn.tokenpicker = function( options ) {
   var events, config,
-      self = jQuery( this );
+      context = jQuery( this );
       TP = jQuery.tokenpicker;
 
-  TP.configure( self, options );
-  config = TP.config( self );
+  TP.configure( context, options );
+  config = TP.config( context );
 
   function run() {
     TP.widget.build();
@@ -44,7 +44,7 @@ jQuery.fn.tokenpicker = function( options ) {
         var result,
             candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId );
 
-        result = jQuery.tokenpicker.search.exec( this );
+        result = jQuery.tokenpicker.search.exec( context, this );
         jQuery.tokenpicker.widget.candidatesArea( result );
 
         if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
@@ -130,7 +130,7 @@ jQuery.fn.tokenpicker = function( options ) {
       events.afterCloseCandidates.apply( this, [ event ] );
 
       if ( current.length > 0 && jQuery.isFunction( config.items.callback.onPick ) ) {
-        config.items.callback.onPick.apply( self, [ tokens ] );
+        config.items.callback.onPick.apply( context, [ tokens ] );
       }
     },
     onRemoveToken: function( event ) {
@@ -141,7 +141,7 @@ jQuery.fn.tokenpicker = function( options ) {
       jQuery.tokenpicker.widget.pickedToken.setVal();
 
       if ( token.length > 0 && jQuery.isFunction( config.items.callback.onRemove ) ) {
-        config.items.callback.onRemove.apply( self, [ data ] );
+        config.items.callback.onRemove.apply( context, [ data ] );
       }
     },
     onClearToken: function( event ) {
@@ -157,7 +157,7 @@ jQuery.fn.tokenpicker = function( options ) {
       jQuery.tokenpicker.widget.pickedToken.setVal();
 
       if ( tokens.length > 0 && jQuery.isFunction( config.items.callback.onClear ) ) {
-        config.items.callback.onClear.apply( self, [ data ] );
+        config.items.callback.onClear.apply( context, [ data ] );
       }
     },
     outerClick: function() {
@@ -176,7 +176,7 @@ jQuery.fn.tokenpicker = function( options ) {
       jQuery.tokenpicker.widget.pickedToken.setVal();
 
       if ( jQuery.isFunction( config.items.callback.onSort ) ) {
-        config.items.callback.onSort.apply( self, [ jQuery.tokenpicker.widget.pickedToken.items() ] );
+        config.items.callback.onSort.apply( context, [ jQuery.tokenpicker.widget.pickedToken.items() ] );
       }
     }
   };

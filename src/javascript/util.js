@@ -1,17 +1,17 @@
 jQuery.tokenpicker.search = {
-  exec: function( input ) {
-    return jQuery.tokenpicker.search.find( jQuery( input ).val() || "" );
+  exec: function( context, input ) {
+    return jQuery.tokenpicker.search.find( context, jQuery( input ).val() || "" );
   },
-  find: function( query ) {
-    var that = this;
+  find: function( context, query ) {
+    var config = jQuery.tokenpicker.config( context );
 
-    return jQuery.map( TOKENS.concat( GROUPS ), function( token ) {
-      if ( jQuery.tokenpicker.search.matchAll( query, token.search.join( "||" ) ) ) {
+    return jQuery.map( config.tokens.concat( config.groups ), function( token ) {
+      if ( jQuery.tokenpicker.search.matchAll( context, query, token.search.join( "||" ) ) ) {
         return token;
       }
     });
   },
-  matchAll: function( query, sequence ) {
+  matchAll: function( context, query, sequence ) {
     var regexes = [ /.*/ ];
 
     if ( query.length > 0) {
