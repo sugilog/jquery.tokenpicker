@@ -1,11 +1,4 @@
-/*!
- * jquery.tokenpicker v0.0.2
- *
- * Copyright (c) 2012 Takayuki Sugita, http://github.com/sugilog
- * Released under the MIT License
-*/
-(function( jQuery ) {
-  "use strict";
+"use strict";
 
 jQuery.fn.tokenpicker = function( options ) {
   var TOKENS, GROUPS,
@@ -623,5 +616,3 @@ if (typeof jQuery.fn.observeField === "undefined") {
     });
   };
 }
-
-})( jQuery );
