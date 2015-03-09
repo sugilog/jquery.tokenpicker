@@ -18,7 +18,14 @@ wrapTemplate = "/*!\n" +
 
 gulp.task( "js", function() {
   return gulp
-    .src( "./src/javascript/*.js" )
+    .src( [
+      "./src/javascript/core.js",
+      "./src/javascript/util.js",
+      "./src/javascript/widget.js",
+      "./src/javascript/event.js",
+      "./src/javascript/observe_field.js",
+      "./src/javascript/outer.js"
+    ])
     .pipe( concat( "jquery.tokenpicker.js" ) )
     .pipe( wrap( wrapTemplate, pkg, { variable: "data" } ) )
     .pipe( gulp.dest( "./dist/javascript/" ) );
