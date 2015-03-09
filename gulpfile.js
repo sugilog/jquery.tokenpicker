@@ -15,11 +15,9 @@ wrapTemplate = "/*!\n" +
                  "<%= data.contents %>" +
                "})();";
 
-console.log( gulp );
-console.log( pkg );
 gulp.task( "js", function() {
   return gulp
-    .src( "./src/javascript/jquery.tokenpicker.js" )
+    .src( "./src/javascript/*.js" )
     .pipe( concat( "jquery.tokenpicker.js" ) )
     .pipe( wrap( wrapTemplate, pkg, { variable: "data" } ) )
     .pipe( gulp.dest( "./dist/javascript/" ) );
