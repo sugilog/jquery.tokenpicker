@@ -30,7 +30,7 @@ jQuery.tokenpicker.widget = {
     wrapper
       .addClass( config.items.cssClass.base )
       .prop( {
-        id: config.selector.baseId.replace( "#", "" )
+        id: config.items.selector.baseId.replace( "#", "" )
       });
 
     context.wrap( wrapper ).css( { display: 'none' } );
@@ -40,58 +40,58 @@ jQuery.tokenpicker.widget = {
 
     jQuery( "<ul>" )
       .prop( {
-        id: config.selector.frameId.replace( "#", "" )
+        id: config.items.selector.frameId.replace( "#", "" )
       })
       .addClass( config.items.cssClass.frame )
       // EVENT: click in frame to focus
       .on( "click.tokenpicker", function() {
-        jQuery( config.selector.inputId ).get(0).focus();
+        jQuery( config.items.selector.inputId ).get(0).focus();
       })
       // EVENT: sort ( required jquery ui sortable; experimental )
       .sortable( {
         placeholder: config.items.cssClass.sortablePlaceholder,
         // EVENT: start sorting
-        start: jQuery.tokenpicker.events.onSortableStart,
+        start: context.events.onSortableStart,
         // EVENT: end sorting
-        update: jQuery.tokenpicker.events.onSortableUpdate
+        update: context.events.onSortableUpdate
       })
-      .appendTo( jQuery( config.selector.baseId ) );
+      .appendTo( jQuery( config.items.selector.baseId ) );
 
-    if ( options.clearButton ) {
+    if ( config.items.clearButton ) {
       jQuery( "<span>" )
         .prop( {
-          id: config.selector.clearButtonId.replace( "#", "" )
+          id: config.items.selector.clearButtonId.replace( "#", "" )
         })
         .addClass( config.items.cssClass.clearButton )
         .text( REMOVE )
-        .on( "click.tokenpicker", jQuery.tokenpicker.events.onClearToken )
-        .appendTo( jQuery( config.selector.baseId ) );
+        .on( "click.tokenpicker", context.events.onClearToken )
+        .appendTo( jQuery( config.items.selector.baseId ) );
     }
   },
   inputField: function( context ) {
-    var input  = jQuery("<input>"),
+    var input  = jQuery( "<input>" ),
         config = jQuery.tokenpicker.config( context );
 
     input
       .prop({
-        id:   config.selector.inputId.replace("#", ""),
+        id:   config.items.selector.inputId.replace("#", ""),
         type: "text",
         "autocomplete": "off"
       })
       .attr( "autocomplete", "off" )
       .addClass( config.items.cssClass.input )
       // EVENT: observe inputing
-      .observeField( 0.15, jQuery.tokenpicker.events.onInputSearchWord )
+      .observeField( 0.15, context.events.onInputSearchWord )
       // EVENT: focus inputing
-      .on( "focus.tokenpicker", jQuery.tokenpicker.events.onFocusInputField )
+      .on( "focus.tokenpicker", context.events.onFocusInputField )
       // EVENT: key control
-      .on( "keydown.tokenpicker", jQuery.tokenpicker.events.onSelectTokenCandidates );
+      .on( "keydown.tokenpicker", context.events.onSelectTokenCandidates );
 
     jQuery( "<li>" )
       .addClass( config.items.cssClass.tokenItems )
       .addClass( config.items.cssClass.inputContainer )
       .append( input )
-      .appendTo( jQuery( config.selector.frameId ) );
+      .appendTo( jQuery( config.items.selector.frameId ) );
   },
   existingTokens: function( context ) {
     var temp, _item,
@@ -146,11 +146,11 @@ jQuery.tokenpicker.widget = {
       label = data.label;
 
       label = jQuery( "<span>" ).text( label );
-      remover = jQuery("<span>")
+      remover = jQuery( "<span>" )
         .addClass( config.items.cssClass.removeToken )
         .text( REMOVE )
         // EVENT: remove token item
-        .on( "click.tokenpicker", jQuery.tokenpicker.events.onRemoveToken );
+        .on( "click.tokenpicker", context.events.onRemoveToken );
 
       tmp = item.clone( true )
       tmp
@@ -160,7 +160,7 @@ jQuery.tokenpicker.widget = {
         .append( label )
         .append( remover );
 
-      jQuery( config.selector.inputId )
+      jQuery( config.items.selector.inputId )
         .closest( "." + config.items.cssClass.tokenItems )
         .before( tmp );
 
@@ -170,18 +170,18 @@ jQuery.tokenpicker.widget = {
     return items;
   },
   candidatesArea: function( context, tokenCandidates ) {
-    var candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId ),
-        config = jQuery.tokenpicker.config( context );
+    var config = jQuery.tokenpicker.config( context ),
+        candidatesArea = jQuery( config.items.selector.candidatesAreaId );
 
     if ( candidatesArea.length === 0 ) {
       candidatesArea =
         jQuery( "<ul>" )
           .prop( {
-            id: jQuery.tokenpicker.widget.candidatesAreaId.replace( "#", "" )
+            id: config.items.selector.candidatesAreaId.replace( "#", "" )
           })
           .addClass( config.items.cssClass.candidatesArea )
 
-      candidatesArea.appendTo( jQuery( config.selector.baseId ) );
+      candidatesArea.appendTo( jQuery( config.items.selector.baseId ) );
     }
     else {
       candidatesArea.children().remove();
@@ -228,7 +228,7 @@ jQuery.tokenpicker.widget = {
   pickedToken: {
     items: function( context ) {
       var config = jQuery.tokenpicker.config( context );
-      return ( jQuery( config.selector.frameId ).find( "." + config.items.cssClass.pickedToken ) || jQuery( undefined ) );
+      return ( jQuery( config.items.selector.frameId ).find( "." + config.items.cssClass.pickedToken ) || jQuery( undefined ) );
     },
     tokens: function( context ) {
       var tokens = jQuery.tokenpicker.widget.pickedToken.items( context ).map( function() {
@@ -250,9 +250,9 @@ jQuery.tokenpicker.widget = {
       jQuery( target ).addClass( config.items.cssClass.currentPick );
     },
     currentPick: function( context ) {
-      var candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId ),
-          current = jQuery( undefined ),
-          config = jQuery.tokenpicker.config( context );
+      var config = jQuery.tokenpicker.config( context ),
+          candidatesArea = jQuery( config.items.selector.candidatesAreaId ),
+          current = jQuery( undefined );
 
       if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
         current = candidatesArea.find( "." + config.items.cssClass.currentPick );

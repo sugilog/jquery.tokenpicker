@@ -64,9 +64,11 @@ jQuery.extend(
     },
     items: function( context, options ) {
       var baseName = jQuery.tokenpicker.config.contextName( context );
+
       return {
         baseName:       baseName,
         tokenSeparator: ( options.separator || "," ),
+        clearButton:    !!options.clearButton,
         placeholders:   {
           sort:  ( options.placeholders.sort  || "HERE" ),
           start: ( options.placeholders.start || "Type to search..." ),
@@ -99,7 +101,7 @@ jQuery.extend(
           frameId:          ( "#tokenpicker_widget_frame_"  + baseName ),
           inputId:          ( "#tokenpicker_widget_input_"  + baseName ),
           clearButtonId:    ( "#tokenpicker_widget_clear_"  + baseName ),
-          candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + baseName ),
+          candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + baseName )
         },
         callback: {
           onPick:   options.onPick,
