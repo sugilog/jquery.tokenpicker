@@ -1,5 +1,4 @@
 var TOKENS, GROUPS,
-    tokenpickerItems, tokenpickerWidget, events, searchUtil,
     self = jQuery( this ),
     REMOVE = "×";
 
@@ -32,7 +31,7 @@ GROUPS = jQuery.map( ( options.groups || [] ), function( group ) {
   };
 });
 
-tokenpickerItems = {
+jQuery.tokenpicker.items = {
   baseName:       self.prop( "name" ),
   tokenSeparator: ( options.separator || "," ),
   placeholders:   {
@@ -71,16 +70,16 @@ tokenpickerItems = {
 };
 
 // share with selectpicker
-searchUtil = {
+jQuery.tokenpicker.search = {
   exec: function( input ) {
-    return searchUtil.find( jQuery( input ).val() || "" );
+    return jQuery.tokenpicker.search.find( jQuery( input ).val() || "" );
   },
   find: function( query ) {
     var that = this;
 
     return jQuery.map( TOKENS.concat( GROUPS ), function( token ) {
       // FIXME: find by Array
-      if ( searchUtil.matchAll( query, token.search.join( "||" ) ) ) {
+      if ( jQuery.tokenpicker.search.matchAll( query, token.search.join( "||" ) ) ) {
         return token;
       }
     });

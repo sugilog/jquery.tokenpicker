@@ -2,45 +2,45 @@ jQuery.tokenpicker.events = {
   onCloseCandidates: function( event ) {
     var base;
 
-    if ( jQuery( this ).hasClass( tokenpickerItems.cssClass.base ) ) {
+    if ( jQuery( this ).hasClass( jQuery.tokenpicker.items.cssClass.base ) ) {
       base = jQuery( this );
     }
     else {
-      base = jQuery( this ).closest( "." + tokenpickerItems.cssClass.base );
+      base = jQuery( this ).closest( "." + jQuery.tokenpicker.items.cssClass.base );
     }
 
-    base.find( "." + tokenpickerItems.cssClass.input ).val( "" );
-    base.find( "." + tokenpickerItems.cssClass.candidatesArea ).remove();
+    base.find( "." + jQuery.tokenpicker.items.cssClass.input ).val( "" );
+    base.find( "." + jQuery.tokenpicker.items.cssClass.candidatesArea ).remove();
   },
   afterCloseCandidates: function( event ) {
-    jQuery( tokenpickerWidget.inputId ).get( 0 ).focus();
+    jQuery( jQuery.tokenpicker.widget.inputId ).get( 0 ).focus();
   },
   onFocusInputField: function( event ) {
-    tokenpickerWidget.candidatesArea();
+    jQuery.tokenpicker.widget.candidatesArea();
   },
   onInputSearchWord: function( event ) {
     if ( jQuery( this ).val() === "" ) {
-      events.onCloseCandidates.apply( this, [ event ] );
-      events.afterCloseCandidates.apply( this, [ event ] );
+      jQuery.tokenpicker.events.onCloseCandidates.apply( this, [ event ] );
+      jQuery.tokenpicker.events.afterCloseCandidates.apply( this, [ event ] );
     }
     else {
       var result,
-          candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId );
+          candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId );
 
-      result = searchUtil.exec( this );
-      tokenpickerWidget.candidatesArea( result );
+      result = jQuery.tokenpicker.search.exec( this );
+      jQuery.tokenpicker.widget.candidatesArea( result );
 
-      if ( candidatesArea.hasClass( tokenpickerItems.cssClass.found ) ) {
-        tokenpickerWidget.candidateItem.setCurrentPick( candidatesArea.children().eq( 0 ) );
+      if ( candidatesArea.hasClass( jQuery.tokenpicker.items.cssClass.found ) ) {
+        jQuery.tokenpicker.widget.candidateItem.setCurrentPick( candidatesArea.children().eq( 0 ) );
       }
     }
   },
   onMouseoverCandidates: function( event ) {
-    tokenpickerWidget.candidateItem.setCurrentPick( this );
+    jQuery.tokenpicker.widget.candidateItem.setCurrentPick( this );
   },
   onClickCandidate: function( event ) {
-    tokenpickerWidget.candidateItem.setCurrentPick( this );
-    events.onPickToken.apply( this, [ event ] );
+    jQuery.tokenpicker.widget.candidateItem.setCurrentPick( this );
+    jQuery.tokenpicker.events.onPickToken.apply( this, [ event ] );
   },
   onSelectTokenCandidates: function( event ) {
     // delete   :  8
@@ -53,20 +53,20 @@ jQuery.tokenpicker.events = {
 
     switch( event.keyCode.toString() ) {
     case "13":
-      events.onPickToken.apply( this, [ event ] );
+      jQuery.tokenpicker.events.onPickToken.apply( this, [ event ] );
       return false;
     case "38":
     case "40":
-      var target = tokenpickerWidget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]();
+      var target = jQuery.tokenpicker.widget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]();
 
       if ( target.length > 0 ) {
-        tokenpickerWidget.candidateItem.setCurrentPick( target );
+        jQuery.tokenpicker.widget.candidateItem.setCurrentPick( target );
       }
 
       break;
     case "37":
     case "39":
-      if ( jQuery( tokenpickerWidget.inputId ).val() !== "" ) {
+      if ( jQuery( jQuery.tokenpicker.widget.inputId ).val() !== "" ) {
         break;
       }
 
@@ -81,85 +81,85 @@ jQuery.tokenpicker.events = {
         append   = "after";
       }
 
-      var target = jQuery( tokenpickerWidget.inputId ).closest( "li" )[ selector ]();
-      target[ append ]( jQuery( tokenpickerWidget.inputId ).closest( "li" ) );
+      var target = jQuery( jQuery.tokenpicker.widget.inputId ).closest( "li" )[ selector ]();
+      target[ append ]( jQuery( jQuery.tokenpicker.widget.inputId ).closest( "li" ) );
 
       setTimeout( function() {
-        jQuery( tokenpickerWidget.inputId ).get( 0 ).focus();
+        jQuery( jQuery.tokenpicker.widget.inputId ).get( 0 ).focus();
       }, 30 );
 
       break;
     case  "8":
     case "46":
-      if ( jQuery( tokenpickerWidget.inputId ).val() !== "" ) {
+      if ( jQuery( jQuery.tokenpicker.widget.inputId ).val() !== "" ) {
         break;
       }
 
-      var target = jQuery( tokenpickerWidget.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
-      events.onRemoveToken.apply( target, [ event ] );
+      var target = jQuery( jQuery.tokenpicker.widget.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
+      jQuery.tokenpicker.events.onRemoveToken.apply( target, [ event ] );
       break;
     }
   },
   onPickToken: function( event ) {
     var tokens,
-        current = tokenpickerWidget.candidateItem.currentPick();
+        current = jQuery.tokenpicker.widget.candidateItem.currentPick();
 
     if ( current.length > 0 ) {
-      tokens = tokenpickerWidget.token( current );
-      tokenpickerWidget.pickedToken.setVal();
+      tokens = jQuery.tokenpicker.widget.token( current );
+      jQuery.tokenpicker.widget.pickedToken.setVal();
     }
 
-    events.onCloseCandidates.apply( this, [ event ] );
-    events.afterCloseCandidates.apply( this, [ event ] );
+    jQuery.tokenpicker.events.onCloseCandidates.apply( this, [ event ] );
+    jQuery.tokenpicker.events.afterCloseCandidates.apply( this, [ event ] );
 
-    if ( current.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onPick ) ) {
-      tokenpickerItems.callback.onPick.apply( self, [ tokens ] );
+    if ( current.length > 0 && jQuery.isFunction( jQuery.tokenpicker.items.callback.onPick ) ) {
+      jQuery.tokenpicker.items.callback.onPick.apply( self, [ tokens ] );
     }
   },
   onRemoveToken: function( event ) {
-    var token = jQuery( this ).closest( "." + tokenpickerItems.cssClass.pickedToken ),
+    var token = jQuery( this ).closest( "." + jQuery.tokenpicker.items.cssClass.pickedToken ),
         data  = token.data();
 
     token.remove();
-    tokenpickerWidget.pickedToken.setVal();
+    jQuery.tokenpicker.widget.pickedToken.setVal();
 
-    if ( token.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onRemove ) ) {
-      tokenpickerItems.callback.onRemove.apply( self, [ data ] );
+    if ( token.length > 0 && jQuery.isFunction( jQuery.tokenpicker.items.callback.onRemove ) ) {
+      jQuery.tokenpicker.items.callback.onRemove.apply( self, [ data ] );
     }
   },
   onClearToken: function( event ) {
     var data,
-        tokens = jQuery( tokenpickerWidget.frameId )
-          .find( "." + tokenpickerItems.cssClass.pickedToken );
+        tokens = jQuery( jQuery.tokenpicker.widget.frameId )
+          .find( "." + jQuery.tokenpicker.items.cssClass.pickedToken );
 
     data = tokens.map( function() {
       return jQuery( this ).data();
     }).toArray();
 
     tokens.remove();
-    tokenpickerWidget.pickedToken.setVal();
+    jQuery.tokenpicker.widget.pickedToken.setVal();
 
-    if ( tokens.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onClear ) ) {
-      tokenpickerItems.callback.onClear.apply( self, [ data ] );
+    if ( tokens.length > 0 && jQuery.isFunction( jQuery.tokenpicker.items.callback.onClear ) ) {
+      jQuery.tokenpicker.items.callback.onClear.apply( self, [ data ] );
     }
   },
   outerClick: function() {
-    jQuery( "." + tokenpickerItems.cssClass.base ).outerOff( "click.tokenpicker" );
+    jQuery( "." + jQuery.tokenpicker.items.cssClass.base ).outerOff( "click.tokenpicker" );
     // EVENT: hide on click out of widget
-    jQuery( "." + tokenpickerItems.cssClass.base ).outerOn( "click.tokenpicker", function( event ) {
+    jQuery( "." + jQuery.tokenpicker.items.cssClass.base ).outerOn( "click.tokenpicker", function( event ) {
       jQuery( this ).each( function() {
-        events.onCloseCandidates.apply( this, [ event ] );
+        jQuery.tokenpicker.events.onCloseCandidates.apply( this, [ event ] );
       });
     });
   },
   onSortableStart: function( event, ui ) {
-    jQuery( "." + tokenpickerItems.cssClass.sortablePlaceholder ).text( tokenpickerItems.placeholders.sort );
+    jQuery( "." + jQuery.tokenpicker.items.cssClass.sortablePlaceholder ).text( jQuery.tokenpicker.items.placeholders.sort );
   },
   onSortableUpdate: function( event, ui ) {
-    tokenpickerWidget.pickedToken.setVal();
+    jQuery.tokenpicker.widget.pickedToken.setVal();
 
-    if ( jQuery.isFunction( tokenpickerItems.callback.onSort ) ) {
-      tokenpickerItems.callback.onSort.apply( self, [ tokenpickerWidget.pickedToken.items() ] );
+    if ( jQuery.isFunction( jQuery.tokenpicker.items.callback.onSort ) ) {
+      jQuery.tokenpicker.items.callback.onSort.apply( self, [ jQuery.tokenpicker.widget.pickedToken.items() ] );
     }
   }
 };
