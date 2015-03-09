@@ -7,27 +7,28 @@ jQuery.tokenpicker.configure = function( object, options ) {
     options
   );
 
-  name          = jQuery.tokenpicker.config.name(   object );
+  name          = jQuery.tokenpicker.config.objectName( object );
   config.tokens = jQuery.tokenpicker.config.tokens( object, options );
-  config.tokens = jQuery.tokenpicker.config.groups( object, options );
-  config.tokens = jQuery.tokenpicker.config.items(  object, options );
+  config.groups = jQuery.tokenpicker.config.groups( object, options );
+  config.items  = jQuery.tokenpicker.config.items(  object, options );
 
   jQuery.tokenpicker.config.configs = jQuery.extend(
     {},
-    jQuery.tokenpicker.config.configs,
-    { name: config }
+    jQuery.tokenpicker.config.configs
   );
+
+  jQuery.tokenpicker.config.configs[ name ] = config;
 };
 
 jQuery.tokenpicker.config = function( object ) {
-  var name = jQuery.tokenpicker.config.name( object );
+  var name = jQuery.tokenpicker.config.objectName( object );
   return jQuery.tokenpicker.config.configs[ name ];
 };
 
 jQuery.extend(
   jQuery.tokenpicker.config,
   {
-    name: function( object ) {
+    objectName: function( object ) {
       return object.prop( "name" );
     },
     tokens: function( object, options ) {
@@ -63,7 +64,7 @@ jQuery.extend(
     },
     items: function( object, options ) {
       return {
-        baseName:       jQuery.tokenpicker.config.name( object ),
+        baseName:       jQuery.tokenpicker.config.objectName( object ),
         tokenSeparator: ( options.separator || "," ),
         placeholders:   {
           sort:  ( options.placeholders.sort  || "HERE" ),

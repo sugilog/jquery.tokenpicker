@@ -10,3 +10,5 @@ jQuery.fn.tokenpicker = function( options ) {
   jQuery( document ).on(  "click.tokenpicker",     self.widget.candidatesAreaId + " li", self.events.onClickCandidate );
   self.events.outerClick();
 };
+
+jQuery.tokenpicker = {};
