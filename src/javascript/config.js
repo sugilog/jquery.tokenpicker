@@ -63,8 +63,9 @@ jQuery.extend(
       });
     },
     items: function( context, options ) {
+      var baseName = jQuery.tokenpicker.config.contextName( context );
       return {
-        baseName:       jQuery.tokenpicker.config.contextName( context ),
+        baseName:       baseName,
         tokenSeparator: ( options.separator || "," ),
         placeholders:   {
           sort:  ( options.placeholders.sort  || "HERE" ),
@@ -92,6 +93,13 @@ jQuery.extend(
           found:                "tokenpicker_candidates_found",
           notFound:             "tokenpicker_candidates_not_found",
           currentPick:          "tokenpicker_current_pick"
+        },
+        selector: {
+          baseId:           ( "#tokenpicker_widget_base_"   + baseName ),
+          frameId:          ( "#tokenpicker_widget_frame_"  + baseName ),
+          inputId:          ( "#tokenpicker_widget_input_"  + baseName ),
+          clearButtonId:    ( "#tokenpicker_widget_clear_"  + baseName ),
+          candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + baseName ),
         },
         callback: {
           onPick:   options.onPick,

@@ -30,10 +30,10 @@ jQuery.fn.tokenpicker = function( options ) {
       base.find( "." + config.items.cssClass.candidatesArea ).remove();
     },
     afterCloseCandidates: function( event ) {
-      jQuery( jQuery.tokenpicker.widget.inputId ).get( 0 ).focus();
+      jQuery( config.selector.inputId ).get( 0 ).focus();
     },
     onFocusInputField: function( event ) {
-      jQuery.tokenpicker.widget.candidatesArea();
+      jQuery.tokenpicker.widget.candidatesArea( context );
     },
     onInputSearchWord: function( event ) {
       if ( jQuery( this ).val() === "" ) {
@@ -45,18 +45,18 @@ jQuery.fn.tokenpicker = function( options ) {
             candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId );
 
         result = jQuery.tokenpicker.search.exec( context, this );
-        jQuery.tokenpicker.widget.candidatesArea( result );
+        jQuery.tokenpicker.widget.candidatesArea( context, result );
 
         if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
-          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( candidatesArea.children().eq( 0 ) );
+          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, candidatesArea.children().eq( 0 ) );
         }
       }
     },
     onMouseoverCandidates: function( event ) {
-      jQuery.tokenpicker.widget.candidateItem.setCurrentPick( this );
+      jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, this );
     },
     onClickCandidate: function( event ) {
-      jQuery.tokenpicker.widget.candidateItem.setCurrentPick( this );
+      jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, this );
       events.onPickToken.apply( this, [ event ] );
     },
     onSelectTokenCandidates: function( event ) {
@@ -74,16 +74,16 @@ jQuery.fn.tokenpicker = function( options ) {
         return false;
       case "38":
       case "40":
-        var target = jQuery.tokenpicker.widget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]();
+        var target = jQuery.tokenpicker.widget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]( context );
 
         if ( target.length > 0 ) {
-          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( target );
+          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, target );
         }
 
         break;
       case "37":
       case "39":
-        if ( jQuery( jQuery.tokenpicker.widget.inputId ).val() !== "" ) {
+        if ( jQuery( config.selector.inputId ).val() !== "" ) {
           break;
         }
 
@@ -98,32 +98,32 @@ jQuery.fn.tokenpicker = function( options ) {
           append   = "after";
         }
 
-        var target = jQuery( jQuery.tokenpicker.widget.inputId ).closest( "li" )[ selector ]();
-        target[ append ]( jQuery( jQuery.tokenpicker.widget.inputId ).closest( "li" ) );
+        var target = jQuery( config.selector.inputId ).closest( "li" )[ selector ]();
+        target[ append ]( jQuery( config.selector.inputId ).closest( "li" ) );
 
         setTimeout( function() {
-          jQuery( jQuery.tokenpicker.widget.inputId ).get( 0 ).focus();
+          jQuery( config.selector.inputId ).get( 0 ).focus();
         }, 30 );
 
         break;
       case  "8":
       case "46":
-        if ( jQuery( jQuery.tokenpicker.widget.inputId ).val() !== "" ) {
+        if ( jQuery( config.selector.inputId ).val() !== "" ) {
           break;
         }
 
-        var target = jQuery( jQuery.tokenpicker.widget.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
+        var target = jQuery( config.selector.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
         events.onRemoveToken.apply( target, [ event ] );
         break;
       }
     },
     onPickToken: function( event ) {
       var tokens,
-          current = jQuery.tokenpicker.widget.candidateItem.currentPick();
+          current = jQuery.tokenpicker.widget.candidateItem.currentPick( context );
 
       if ( current.length > 0 ) {
-        tokens = jQuery.tokenpicker.widget.token( current );
-        jQuery.tokenpicker.widget.pickedToken.setVal();
+        tokens = jQuery.tokenpicker.widget.token( context, current );
+        jQuery.tokenpicker.widget.pickedToken.setVal( context );
       }
 
       events.onCloseCandidates.apply( this, [ event ] );
@@ -138,7 +138,7 @@ jQuery.fn.tokenpicker = function( options ) {
           data  = token.data();
 
       token.remove();
-      jQuery.tokenpicker.widget.pickedToken.setVal();
+      jQuery.tokenpicker.widget.pickedToken.setVal( context );
 
       if ( token.length > 0 && jQuery.isFunction( config.items.callback.onRemove ) ) {
         config.items.callback.onRemove.apply( context, [ data ] );
@@ -146,7 +146,7 @@ jQuery.fn.tokenpicker = function( options ) {
     },
     onClearToken: function( event ) {
       var data,
-          tokens = jQuery( jQuery.tokenpicker.widget.frameId )
+          tokens = jQuery( config.selector.frameId )
             .find( "." + config.items.cssClass.pickedToken );
 
       data = tokens.map( function() {
@@ -154,7 +154,7 @@ jQuery.fn.tokenpicker = function( options ) {
       }).toArray();
 
       tokens.remove();
-      jQuery.tokenpicker.widget.pickedToken.setVal();
+      jQuery.tokenpicker.widget.pickedToken.setVal( context );
 
       if ( tokens.length > 0 && jQuery.isFunction( config.items.callback.onClear ) ) {
         config.items.callback.onClear.apply( context, [ data ] );
@@ -173,10 +173,10 @@ jQuery.fn.tokenpicker = function( options ) {
       jQuery( "." + config.items.cssClass.sortablePlaceholder ).text( config.items.placeholders.sort );
     },
     onSortableUpdate: function( event, ui ) {
-      jQuery.tokenpicker.widget.pickedToken.setVal();
+      jQuery.tokenpicker.widget.pickedToken.setVal( context );
 
       if ( jQuery.isFunction( config.items.callback.onSort ) ) {
-        config.items.callback.onSort.apply( context, [ jQuery.tokenpicker.widget.pickedToken.items() ] );
+        config.items.callback.onSort.apply( context, [ jQuery.tokenpicker.widget.pickedToken.items( context ) ] );
       }
     }
   };

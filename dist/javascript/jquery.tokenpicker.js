@@ -8,111 +8,207 @@
 ( function() {
 "use strict";
 jQuery.fn.tokenpicker = function( options ) {
-  var self = jQuery.tokenpicker;
+  var events, config,
+      context = jQuery( this );
+      TP = jQuery.tokenpicker;
 
-  options = jQuery.extend(
-    { placeholders: {}, images: {} },
-    options
-  );
+  TP.configure( context, options );
+  config = TP.config( context );
 
-  // FIXME: build TOKENS, GROUPS, ...
+  function run() {
+    TP.widget.build();
+    jQuery( document ).off( "mouseover.tokenpicker", TP.widget.candidatesAreaId + " li" );
+    jQuery( document ).off( "click.tokenpicker",     TP.widget.candidatesAreaId + " li" );
+    jQuery( document ).on(  "mouseover.tokenpicker", TP.widget.candidatesAreaId + " li", events.onMouseoverCandidates );
+    jQuery( document ).on(  "click.tokenpicker",     TP.widget.candidatesAreaId + " li", events.onClickCandidate );
+    events.outerClick();
+  };
 
-  self.widget.build();
-  jQuery( document ).off( "mouseover.tokenpicker", self.widget.candidatesAreaId + " li" );
-  jQuery( document ).off( "click.tokenpicker",     self.widget.candidatesAreaId + " li" );
-  jQuery( document ).on(  "mouseover.tokenpicker", self.widget.candidatesAreaId + " li", self.events.onMouseoverCandidates );
-  jQuery( document ).on(  "click.tokenpicker",     self.widget.candidatesAreaId + " li", self.events.onClickCandidate );
-  self.events.outerClick();
+  events = {
+    onCloseCandidates: function( event ) {
+      var base;
+
+      if ( jQuery( this ).hasClass( config.items.cssClass.base ) ) {
+        base = jQuery( this );
+      }
+      else {
+        base = jQuery( this ).closest( "." + config.items.cssClass.base );
+      }
+
+      base.find( "." + config.items.cssClass.input ).val( "" );
+      base.find( "." + config.items.cssClass.candidatesArea ).remove();
+    },
+    afterCloseCandidates: function( event ) {
+      jQuery( config.selector.inputId ).get( 0 ).focus();
+    },
+    onFocusInputField: function( event ) {
+      jQuery.tokenpicker.widget.candidatesArea( context );
+    },
+    onInputSearchWord: function( event ) {
+      if ( jQuery( this ).val() === "" ) {
+        events.onCloseCandidates.apply( this, [ event ] );
+        events.afterCloseCandidates.apply( this, [ event ] );
+      }
+      else {
+        var result,
+            candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId );
+
+        result = jQuery.tokenpicker.search.exec( context, this );
+        jQuery.tokenpicker.widget.candidatesArea( context, result );
+
+        if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
+          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, candidatesArea.children().eq( 0 ) );
+        }
+      }
+    },
+    onMouseoverCandidates: function( event ) {
+      jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, this );
+    },
+    onClickCandidate: function( event ) {
+      jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, this );
+      events.onPickToken.apply( this, [ event ] );
+    },
+    onSelectTokenCandidates: function( event ) {
+      // delete   :  8
+      // enter    : 13
+      // up       : 38
+      // down     : 40
+      // left     : 37
+      // right    : 39
+      // backspace: 46
+
+      switch( event.keyCode.toString() ) {
+      case "13":
+        events.onPickToken.apply( this, [ event ] );
+        return false;
+      case "38":
+      case "40":
+        var target = jQuery.tokenpicker.widget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]( context );
+
+        if ( target.length > 0 ) {
+          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, target );
+        }
+
+        break;
+      case "37":
+      case "39":
+        if ( jQuery( config.selector.inputId ).val() !== "" ) {
+          break;
+        }
+
+        var selector, append;
+
+        if ( event.keyCode.toString() === "37" ) {
+          selector = "prev";
+          append   = "before";
+        }
+        else {
+          selector = "next";
+          append   = "after";
+        }
+
+        var target = jQuery( config.selector.inputId ).closest( "li" )[ selector ]();
+        target[ append ]( jQuery( config.selector.inputId ).closest( "li" ) );
+
+        setTimeout( function() {
+          jQuery( config.selector.inputId ).get( 0 ).focus();
+        }, 30 );
+
+        break;
+      case  "8":
+      case "46":
+        if ( jQuery( config.selector.inputId ).val() !== "" ) {
+          break;
+        }
+
+        var target = jQuery( config.selector.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
+        events.onRemoveToken.apply( target, [ event ] );
+        break;
+      }
+    },
+    onPickToken: function( event ) {
+      var tokens,
+          current = jQuery.tokenpicker.widget.candidateItem.currentPick( context );
+
+      if ( current.length > 0 ) {
+        tokens = jQuery.tokenpicker.widget.token( context, current );
+        jQuery.tokenpicker.widget.pickedToken.setVal( context );
+      }
+
+      events.onCloseCandidates.apply( this, [ event ] );
+      events.afterCloseCandidates.apply( this, [ event ] );
+
+      if ( current.length > 0 && jQuery.isFunction( config.items.callback.onPick ) ) {
+        config.items.callback.onPick.apply( context, [ tokens ] );
+      }
+    },
+    onRemoveToken: function( event ) {
+      var token = jQuery( this ).closest( "." + config.items.cssClass.pickedToken ),
+          data  = token.data();
+
+      token.remove();
+      jQuery.tokenpicker.widget.pickedToken.setVal( context );
+
+      if ( token.length > 0 && jQuery.isFunction( config.items.callback.onRemove ) ) {
+        config.items.callback.onRemove.apply( context, [ data ] );
+      }
+    },
+    onClearToken: function( event ) {
+      var data,
+          tokens = jQuery( config.selector.frameId )
+            .find( "." + config.items.cssClass.pickedToken );
+
+      data = tokens.map( function() {
+        return jQuery( this ).data();
+      }).toArray();
+
+      tokens.remove();
+      jQuery.tokenpicker.widget.pickedToken.setVal( context );
+
+      if ( tokens.length > 0 && jQuery.isFunction( config.items.callback.onClear ) ) {
+        config.items.callback.onClear.apply( context, [ data ] );
+      }
+    },
+    outerClick: function() {
+      jQuery( "." + config.items.cssClass.base ).outerOff( "click.tokenpicker" );
+      // EVENT: hide on click out of widget
+      jQuery( "." + config.items.cssClass.base ).outerOn( "click.tokenpicker", function( event ) {
+        jQuery( this ).each( function() {
+          events.onCloseCandidates.apply( this, [ event ] );
+        });
+      });
+    },
+    onSortableStart: function( event, ui ) {
+      jQuery( "." + config.items.cssClass.sortablePlaceholder ).text( config.items.placeholders.sort );
+    },
+    onSortableUpdate: function( event, ui ) {
+      jQuery.tokenpicker.widget.pickedToken.setVal( context );
+
+      if ( jQuery.isFunction( config.items.callback.onSort ) ) {
+        config.items.callback.onSort.apply( context, [ jQuery.tokenpicker.widget.pickedToken.items( context ) ] );
+      }
+    }
+  };
+
+  run();
 };
 
-var TOKENS, GROUPS,
-    tokenpickerItems, tokenpickerWidget, events, searchUtil,
-    self = jQuery( this ),
-    REMOVE = "×";
+jQuery.tokenpicker = {};
 
-TOKENS = jQuery.map( options.tokens, function( token ) {
-  var searchValues = jQuery.map( options.searchKeys, function( key ) {
-    return token[ key ];
-  });
-
-  return {
-    token:    token[ options.tokenKey ],
-    label:    token[ options.labelKey ],
-    search:   searchValues,
-    original: token,
-    image:    token[ options.imageKey ]
-  };
-});
-
-GROUPS = jQuery.map( ( options.groups || [] ), function( group ) {
-  var searchValues = jQuery.map( options.searchKeys, function( key ) {
-    return group[ key ];
-  });
-
-  return {
-    token:    "group_" + group[ options.tokenKey ].join( "_" ),
-    tokens:   group[ options.tokenKey ] || [],
-    label:    group[ options.labelKey ],
-    search:   searchValues,
-    original: group,
-    image:    group[ options.imageKey ]
-  };
-});
-
-tokenpickerItems = {
-  baseName:       self.prop( "name" ),
-  tokenSeparator: ( options.separator || "," ),
-  placeholders:   {
-    sort:  ( options.placeholders.sort  || "HERE" ),
-    start: ( options.placeholders.start || "Type to search..." ),
-    none:  ( options.placeholders.none  || "No Results." )
+jQuery.tokenpicker.search = {
+  exec: function( context, input ) {
+    return jQuery.tokenpicker.search.find( context, jQuery( input ).val() || "" );
   },
-  images: {
-    display: !!options.images.display,
-    cached:  {},
-    width:   ( options.images.width  || 50 ),
-    height:  ( options.images.height || 50 )
-  },
-  cssClass: {
-    base:                 "tokenpicker_base",
-    frame:                options.clearButton ? "tokenpicker_frame_with_clear" : "tokenpicker_frame",
-    clearButton:          "tokenpicker_clear_token",
-    tokenItems:           "tokenpicker_frame_items",
-    pickedToken:          "tokenpicker_frame_picked_token",
-    sortablePlaceholder : "tokenpicker_frame_sortable_placeholder",
-    inputContainer:       "tokenpicker_frame_input_container",
-    input:                "tokenpicker_input",
-    removeToken:          "tokenpicker_remove_token",
-    candidatesArea:       "tokenpicker_candidates_area",
-    tokenCandidates:      "tokenpicker_token_candidates",
-    found:                "tokenpicker_candidates_found",
-    notFound:             "tokenpicker_candidates_not_found",
-    currentPick:          "tokenpicker_current_pick"
-  },
-  callback: {
-    onPick:   options.onPick,
-    onRemove: options.onRemove,
-    onSort:   options.onSort,
-    onClear:  options.onClear
-  }
-};
+  find: function( context, query ) {
+    var config = jQuery.tokenpicker.config( context );
 
-// share with selectpicker
-searchUtil = {
-  exec: function( input ) {
-    return searchUtil.find( jQuery( input ).val() || "" );
-  },
-  find: function( query ) {
-    var that = this;
-
-    return jQuery.map( TOKENS.concat( GROUPS ), function( token ) {
-      // FIXME: find by Array
-      if ( searchUtil.matchAll( query, token.search.join( "||" ) ) ) {
+    return jQuery.map( config.tokens.concat( config.groups ), function( token ) {
+      if ( jQuery.tokenpicker.search.matchAll( context, query, token.search.join( "||" ) ) ) {
         return token;
       }
     });
   },
-  matchAll: function( query, sequence ) {
+  matchAll: function( context, query, sequence ) {
     var regexes = [ /.*/ ];
 
     if ( query.length > 0) {
@@ -134,104 +230,108 @@ searchUtil = {
   }
 };
 
+var REMOVE = "×";
+
 jQuery.tokenpicker.widget = {
-  baseId:        ( "#tokenpicker_widget_base_"   + tokenpickerItems.baseName ),
-  frameId:       ( "#tokenpicker_widget_frame_"  + tokenpickerItems.baseName ),
-  inputId:       ( "#tokenpicker_widget_input_"  + tokenpickerItems.baseName ),
-  clearButtonId: ( "#tokenpicker_widget_clear_"  + tokenpickerItems.baseName ),
-  candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + tokenpickerItems.baseName ),
-  build: function(){
-    this.base();
-    this.frame();
-    this.inputField();
-    this.existingTokens();
-    this.cacheImage();
+  build: function( context ) {
+    this.base( context );
+    this.frame( context );
+    this.inputField( context );
+    this.existingTokens( context );
+    this.cacheImage( context );
   },
-  cacheImage: function() {
-    if ( tokenpickerItems.images.display ) {
-      jQuery.each( TOKENS.concat( GROUPS ), function( _, item ) {
+  cacheImage: function( context ) {
+    var config  = jQuery.tokenpicker.config( context );
+
+    if ( config.items.images.display ) {
+      jQuery.each( config.tokens.concat( config.groups ), function( _, item ) {
         if ( typeof item.image !== "undefined" ) {
           var cache    = new Image();
-          cache.width  = tokenpickerItems.images.width;
-          cache.height = tokenpickerItems.images.height;
+          cache.width  = config.items.images.width;
+          cache.height = config.items.images.height;
           cache.src    = item.image;
-          tokenpickerItems.images.cached[ item.token ] = cache;
+          config.items.images.cached[ item.token ] = cache;
         }
       });
     }
   },
-  base: function() {
-    var wrapper = jQuery( "<div>" );
+  base: function( context ) {
+    var wrapper = jQuery( "<div>" ),
+        config  = jQuery.tokenpicker.config( context );
 
     wrapper
-      .addClass( tokenpickerItems.cssClass.base )
+      .addClass( config.items.cssClass.base )
       .prop( {
-        id: tokenpickerWidget.baseId.replace( "#", "" )
+        id: config.selector.baseId.replace( "#", "" )
       });
 
-    self.wrap( wrapper ).css( { display: 'none' } );
+    context.wrap( wrapper ).css( { display: 'none' } );
   },
-  frame: function() {
+  frame: function( context ) {
+    var config = jQuery.tokenpicker.config( context );
+
     jQuery( "<ul>" )
       .prop( {
-        id: tokenpickerWidget.frameId.replace( "#", "" )
+        id: config.selector.frameId.replace( "#", "" )
       })
-      .addClass( tokenpickerItems.cssClass.frame )
+      .addClass( config.items.cssClass.frame )
       // EVENT: click in frame to focus
       .on( "click.tokenpicker", function() {
-        jQuery(tokenpickerWidget.inputId).get(0).focus();
+        jQuery( config.selector.inputId ).get(0).focus();
       })
       // EVENT: sort ( required jquery ui sortable; experimental )
       .sortable( {
-        placeholder: tokenpickerItems.cssClass.sortablePlaceholder,
+        placeholder: config.items.cssClass.sortablePlaceholder,
         // EVENT: start sorting
-        start: events.onSortableStart,
+        start: jQuery.tokenpicker.events.onSortableStart,
         // EVENT: end sorting
-        update: events.onSortableUpdate
+        update: jQuery.tokenpicker.events.onSortableUpdate
       })
-      .appendTo( jQuery( tokenpickerWidget.baseId ) );
+      .appendTo( jQuery( config.selector.baseId ) );
 
     if ( options.clearButton ) {
       jQuery( "<span>" )
         .prop( {
-          id: tokenpickerWidget.clearButtonId.replace( "#", "" )
+          id: config.selector.clearButtonId.replace( "#", "" )
         })
-        .addClass( tokenpickerItems.cssClass.clearButton )
+        .addClass( config.items.cssClass.clearButton )
         .text( REMOVE )
-        .on( "click.tokenpicker", events.onClearToken )
-        .appendTo( jQuery( tokenpickerWidget.baseId ) );
+        .on( "click.tokenpicker", jQuery.tokenpicker.events.onClearToken )
+        .appendTo( jQuery( config.selector.baseId ) );
     }
   },
-  inputField: function() {
-    var input = jQuery("<input>");
+  inputField: function( context ) {
+    var input  = jQuery("<input>"),
+        config = jQuery.tokenpicker.config( context );
 
     input
       .prop({
-        id:   tokenpickerWidget.inputId.replace("#", ""),
+        id:   config.selector.inputId.replace("#", ""),
         type: "text",
         "autocomplete": "off"
       })
       .attr( "autocomplete", "off" )
-      .addClass( tokenpickerItems.cssClass.input )
+      .addClass( config.items.cssClass.input )
       // EVENT: observe inputing
-      .observeField( 0.15, events.onInputSearchWord )
+      .observeField( 0.15, jQuery.tokenpicker.events.onInputSearchWord )
       // EVENT: focus inputing
-      .on( "focus.tokenpicker", events.onFocusInputField )
+      .on( "focus.tokenpicker", jQuery.tokenpicker.events.onFocusInputField )
       // EVENT: key control
-      .on( "keydown.tokenpicker", events.onSelectTokenCandidates );
+      .on( "keydown.tokenpicker", jQuery.tokenpicker.events.onSelectTokenCandidates );
 
     jQuery( "<li>" )
-      .addClass( tokenpickerItems.cssClass.tokenItems )
-      .addClass( tokenpickerItems.cssClass.inputContainer )
+      .addClass( config.items.cssClass.tokenItems )
+      .addClass( config.items.cssClass.inputContainer )
       .append( input )
-      .appendTo( jQuery( tokenpickerWidget.frameId ) );
+      .appendTo( jQuery( config.selector.frameId ) );
   },
-  existingTokens: function() {
+  existingTokens: function( context ) {
     var temp, _item,
         existingItems = {},
-        existingTokens = self.val().split( tokenpickerItems.tokenSeparator );
+        config = jQuery.tokenpicker.config( context ),
+        existingTokens = context.val().split( config.items.tokenSeparator );
 
-    temp = jQuery.grep( TOKENS.concat( GROUPS ), function( item ) {
+    temp = jQuery.grep( config.tokens.concat( config.groups ), function( item ) {
       return ( jQuery.inArray( item.token.toString(), existingTokens ) > -1 );
     })
 
@@ -241,14 +341,15 @@ jQuery.tokenpicker.widget = {
 
     jQuery.each( existingTokens, function( _, token ) {
       if ( _item = existingItems[ token ] ) {
-        tokenpickerWidget.token( _item );
+        jQuery.tokenpicker.widget.token( context, _item );
       }
     });
   },
-  token: function( pickedItem ) {
+  token: function( context, pickedItem ) {
     var label, datum, items, tmp, existingTokens,
         item = jQuery( "<li>" ),
-        remover = jQuery( "<span>" );
+        remover = jQuery( "<span>" ),
+        config  = jQuery.tokenpicker.config( context );
 
     if ( jQuery.isPlainObject( pickedItem ) ) {
       datum = pickedItem;
@@ -258,12 +359,12 @@ jQuery.tokenpicker.widget = {
     }
 
     if ( typeof datum.tokens !== "undefined" ) {
-      existingTokens = self.val().split( tokenpickerItems.tokenSeparator );
+      existingTokens = context.val().split( config.items.tokenSeparator );
 
       datum = jQuery.map( datum.tokens, function( token ) {
         // FIXME: performance
         if ( jQuery.inArray( token.toString(), existingTokens ) === -1 ) {
-          return jQuery.grep( TOKENS, function( item ) {
+          return jQuery.grep( config.tokens, function( item ) {
            return item.token.toString() === token.toString();
           });
         }
@@ -278,21 +379,21 @@ jQuery.tokenpicker.widget = {
 
       label = jQuery( "<span>" ).text( label );
       remover = jQuery("<span>")
-        .addClass( tokenpickerItems.cssClass.removeToken )
+        .addClass( config.items.cssClass.removeToken )
         .text( REMOVE )
         // EVENT: remove token item
-        .on( "click.tokenpicker", events.onRemoveToken );
+        .on( "click.tokenpicker", jQuery.tokenpicker.events.onRemoveToken );
 
       tmp = item.clone( true )
       tmp
-        .addClass( tokenpickerItems.cssClass.tokenItems )
-        .addClass( tokenpickerItems.cssClass.pickedToken )
+        .addClass( config.items.cssClass.tokenItems )
+        .addClass( config.items.cssClass.pickedToken )
         .data( data )
         .append( label )
         .append( remover );
 
-      jQuery( tokenpickerWidget.inputId )
-        .closest( "." + tokenpickerItems.cssClass.tokenItems )
+      jQuery( config.selector.inputId )
+        .closest( "." + config.items.cssClass.tokenItems )
         .before( tmp );
 
       return tmp;
@@ -300,27 +401,28 @@ jQuery.tokenpicker.widget = {
 
     return items;
   },
-  candidatesArea: function( tokenCandidates ) {
-    var candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId );
+  candidatesArea: function( context, tokenCandidates ) {
+    var candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId ),
+        config = jQuery.tokenpicker.config( context );
 
     if ( candidatesArea.length === 0 ) {
       candidatesArea =
         jQuery( "<ul>" )
           .prop( {
-            id: tokenpickerWidget.candidatesAreaId.replace( "#", "" )
+            id: jQuery.tokenpicker.widget.candidatesAreaId.replace( "#", "" )
           })
-          .addClass( tokenpickerItems.cssClass.candidatesArea )
+          .addClass( config.items.cssClass.candidatesArea )
 
-      candidatesArea.appendTo( jQuery( tokenpickerWidget.baseId ) );
+      candidatesArea.appendTo( jQuery( config.selector.baseId ) );
     }
     else {
       candidatesArea.children().remove();
-      candidatesArea.removeClass( tokenpickerItems.cssClass.found );
-      candidatesArea.removeClass( tokenpickerItems.cssClass.notFound );
+      candidatesArea.removeClass( config.items.cssClass.found );
+      candidatesArea.removeClass( config.items.cssClass.notFound );
     }
 
     if ( typeof tokenCandidates !== "undefined" ) {
-      var pickedTokens = tokenpickerWidget.pickedToken.tokens();
+      var pickedTokens = jQuery.tokenpicker.widget.pickedToken.tokens( context );
 
       tokenCandidates = jQuery( tokenCandidates ).map(function( _, item ) {
         if ( jQuery.inArray( item.token, pickedTokens ) === -1 ) {
@@ -330,23 +432,23 @@ jQuery.tokenpicker.widget = {
     }
 
     if (typeof tokenCandidates === "undefined") {
-      tokenCandidates = [ { token: undefined, label: tokenpickerItems.placeholders.start } ];
-      candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
+      tokenCandidates = [ { token: undefined, label: config.items.placeholders.start } ];
+      candidatesArea.addClass( config.items.cssClass.notFound );
     }
     else if ( tokenCandidates.length === 0 ) {
-      tokenCandidates = [ { token: undefined, label: tokenpickerItems.placeholders.none } ];
-      candidatesArea.addClass( tokenpickerItems.cssClass.notFound );
+      tokenCandidates = [ { token: undefined, label: config.items.placeholders.none } ];
+      candidatesArea.addClass( config.items.cssClass.notFound );
     }
     else {
-      candidatesArea.addClass( tokenpickerItems.cssClass.found );
+      candidatesArea.addClass( config.items.cssClass.found );
     }
 
     jQuery( tokenCandidates ).each(function( _, item ){
-      var candidate = jQuery("<li>").data(item).addClass( tokenpickerItems.cssClass.tokenCandidates );
+      var candidate = jQuery("<li>").data(item).addClass( config.items.cssClass.tokenCandidates );
 
-      if ( typeof tokenpickerItems.images.cached[ item.token ] !== "undefined" ) {
+      if ( typeof config.items.images.cached[ item.token ] !== "undefined" ) {
         candidate.append(
-          jQuery( tokenpickerItems.images.cached[ item.token ] ).css( { verticalAlign: "middle", marginRight: 10 } )
+          jQuery( config.items.images.cached[ item.token ] ).css( { verticalAlign: "middle", marginRight: 10 } )
         );
       }
 
@@ -356,215 +458,50 @@ jQuery.tokenpicker.widget = {
     });
   },
   pickedToken: {
-    items: function() {
-      return ( jQuery( tokenpickerWidget.frameId ).find( "." + tokenpickerItems.cssClass.pickedToken ) || jQuery( undefined ) );
+    items: function( context ) {
+      var config = jQuery.tokenpicker.config( context );
+      return ( jQuery( config.selector.frameId ).find( "." + config.items.cssClass.pickedToken ) || jQuery( undefined ) );
     },
-    tokens: function() {
-      var tokens = tokenpickerWidget.pickedToken.items().map(
-        function() {
-          return jQuery( this ).data().token;
-        }
-      ).toArray();
+    tokens: function( context ) {
+      var tokens = jQuery.tokenpicker.widget.pickedToken.items( context ).map( function() {
+        return jQuery( this ).data().token;
+      }).toArray();
 
       return tokens || [];
     },
-    setVal: function() {
-      var pickedTokens = tokenpickerWidget.pickedToken.tokens();
-      self.val(pickedTokens.join( tokenpickerItems.tokenSeparator ));
+    setVal: function( context ) {
+      var pickedTokens = jQuery.tokenpicker.widget.pickedToken.tokens( context ),
+          config = jQuery.tokenpicker.config( context );
+      context.val(pickedTokens.join( config.items.tokenSeparator ));
     }
   },
   candidateItem: {
-    setCurrentPick: function( target ) {
-      jQuery( target ).siblings().removeClass( tokenpickerItems.cssClass.currentPick );
-      jQuery( target ).addClass( tokenpickerItems.cssClass.currentPick );
+    setCurrentPick: function( context, target ) {
+      var config = jQuery.tokenpicker.config( context );
+      jQuery( target ).siblings().removeClass( config.items.cssClass.currentPick );
+      jQuery( target ).addClass( config.items.cssClass.currentPick );
     },
-    currentPick: function() {
-      var candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId ),
-          current = jQuery( undefined );
+    currentPick: function( context ) {
+      var candidatesArea = jQuery( jQuery.tokenpicker.widget.candidatesAreaId ),
+          current = jQuery( undefined ),
+          config = jQuery.tokenpicker.config( context );
 
-      if ( candidatesArea.hasClass( tokenpickerItems.cssClass.found ) ) {
-        current = candidatesArea.find( "." + tokenpickerItems.cssClass.currentPick );
+      if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
+        current = candidatesArea.find( "." + config.items.cssClass.currentPick );
       }
 
       return current;
     },
-    next: function() {
-      var current = tokenpickerWidget.candidateItem.currentPick();
+    next: function( context ) {
+      var current = jQuery.tokenpicker.widget.candidateItem.currentPick( context );
       return current.next();
     },
-    prev: function() {
-      var current = tokenpickerWidget.candidateItem.currentPick();
+    prev: function( context ) {
+      var current = jQuery.tokenpicker.widget.candidateItem.currentPick( context );
       return current.prev();
     }
   }
 };
-
-jQuery.tokenpicker.events = {
-  onCloseCandidates: function( event ) {
-    var base;
-
-    if ( jQuery( this ).hasClass( tokenpickerItems.cssClass.base ) ) {
-      base = jQuery( this );
-    }
-    else {
-      base = jQuery( this ).closest( "." + tokenpickerItems.cssClass.base );
-    }
-
-    base.find( "." + tokenpickerItems.cssClass.input ).val( "" );
-    base.find( "." + tokenpickerItems.cssClass.candidatesArea ).remove();
-  },
-  afterCloseCandidates: function( event ) {
-    jQuery( tokenpickerWidget.inputId ).get( 0 ).focus();
-  },
-  onFocusInputField: function( event ) {
-    tokenpickerWidget.candidatesArea();
-  },
-  onInputSearchWord: function( event ) {
-    if ( jQuery( this ).val() === "" ) {
-      events.onCloseCandidates.apply( this, [ event ] );
-      events.afterCloseCandidates.apply( this, [ event ] );
-    }
-    else {
-      var result,
-          candidatesArea = jQuery( tokenpickerWidget.candidatesAreaId );
-
-      result = searchUtil.exec( this );
-      tokenpickerWidget.candidatesArea( result );
-
-      if ( candidatesArea.hasClass( tokenpickerItems.cssClass.found ) ) {
-        tokenpickerWidget.candidateItem.setCurrentPick( candidatesArea.children().eq( 0 ) );
-      }
-    }
-  },
-  onMouseoverCandidates: function( event ) {
-    tokenpickerWidget.candidateItem.setCurrentPick( this );
-  },
-  onClickCandidate: function( event ) {
-    tokenpickerWidget.candidateItem.setCurrentPick( this );
-    events.onPickToken.apply( this, [ event ] );
-  },
-  onSelectTokenCandidates: function( event ) {
-    // delete   :  8
-    // enter    : 13
-    // up       : 38
-    // down     : 40
-    // left     : 37
-    // right    : 39
-    // backspace: 46
-
-    switch( event.keyCode.toString() ) {
-    case "13":
-      events.onPickToken.apply( this, [ event ] );
-      return false;
-    case "38":
-    case "40":
-      var target = tokenpickerWidget.candidateItem[ ( event.keyCode.toString() === "38" ) ? "prev" : "next" ]();
-
-      if ( target.length > 0 ) {
-        tokenpickerWidget.candidateItem.setCurrentPick( target );
-      }
-
-      break;
-    case "37":
-    case "39":
-      if ( jQuery( tokenpickerWidget.inputId ).val() !== "" ) {
-        break;
-      }
-
-      var selector, append;
-
-      if ( event.keyCode.toString() === "37" ) {
-        selector = "prev";
-        append   = "before";
-      }
-      else {
-        selector = "next";
-        append   = "after";
-      }
-
-      var target = jQuery( tokenpickerWidget.inputId ).closest( "li" )[ selector ]();
-      target[ append ]( jQuery( tokenpickerWidget.inputId ).closest( "li" ) );
-
-      setTimeout( function() {
-        jQuery( tokenpickerWidget.inputId ).get( 0 ).focus();
-      }, 30 );
-
-      break;
-    case  "8":
-    case "46":
-      if ( jQuery( tokenpickerWidget.inputId ).val() !== "" ) {
-        break;
-      }
-
-      var target = jQuery( tokenpickerWidget.inputId ).closest( "li" )[ event.keyCode.toString() === "8" ? "prev" : "next" ]();
-      events.onRemoveToken.apply( target, [ event ] );
-      break;
-    }
-  },
-  onPickToken: function( event ) {
-    var tokens,
-        current = tokenpickerWidget.candidateItem.currentPick();
-
-    if ( current.length > 0 ) {
-      tokens = tokenpickerWidget.token( current );
-      tokenpickerWidget.pickedToken.setVal();
-    }
-
-    events.onCloseCandidates.apply( this, [ event ] );
-    events.afterCloseCandidates.apply( this, [ event ] );
-
-    if ( current.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onPick ) ) {
-      tokenpickerItems.callback.onPick.apply( self, [ tokens ] );
-    }
-  },
-  onRemoveToken: function( event ) {
-    var token = jQuery( this ).closest( "." + tokenpickerItems.cssClass.pickedToken ),
-        data  = token.data();
-
-    token.remove();
-    tokenpickerWidget.pickedToken.setVal();
-
-    if ( token.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onRemove ) ) {
-      tokenpickerItems.callback.onRemove.apply( self, [ data ] );
-    }
-  },
-  onClearToken: function( event ) {
-    var data,
-        tokens = jQuery( tokenpickerWidget.frameId )
-          .find( "." + tokenpickerItems.cssClass.pickedToken );
-
-    data = tokens.map( function() {
-      return jQuery( this ).data();
-    }).toArray();
-
-    tokens.remove();
-    tokenpickerWidget.pickedToken.setVal();
-
-    if ( tokens.length > 0 && jQuery.isFunction( tokenpickerItems.callback.onClear ) ) {
-      tokenpickerItems.callback.onClear.apply( self, [ data ] );
-    }
-  },
-  outerClick: function() {
-    jQuery( "." + tokenpickerItems.cssClass.base ).outerOff( "click.tokenpicker" );
-    // EVENT: hide on click out of widget
-    jQuery( "." + tokenpickerItems.cssClass.base ).outerOn( "click.tokenpicker", function( event ) {
-      jQuery( this ).each( function() {
-        events.onCloseCandidates.apply( this, [ event ] );
-      });
-    });
-  },
-  onSortableStart: function( event, ui ) {
-    jQuery( "." + tokenpickerItems.cssClass.sortablePlaceholder ).text( tokenpickerItems.placeholders.sort );
-  },
-  onSortableUpdate: function( event, ui ) {
-    tokenpickerWidget.pickedToken.setVal();
-
-    if ( jQuery.isFunction( tokenpickerItems.callback.onSort ) ) {
-      tokenpickerItems.callback.onSort.apply( self, [ tokenpickerWidget.pickedToken.items() ] );
-    }
-  }
-};
-
 
 if (typeof jQuery.fn.observeField === "undefined") {
   // jquery.observe_field
