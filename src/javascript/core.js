@@ -1,12 +1,7 @@
 jQuery.fn.tokenpicker = function( options ) {
   var self = jQuery.tokenpicker;
 
-  options = jQuery.extend(
-    { placeholders: {}, images: {} },
-    options
-  );
-
-  // FIXME: build TOKENS, GROUPS, ...
+  self.configure( jQuery( this ), options );
 
   self.widget.build();
   jQuery( document ).off( "mouseover.tokenpicker", self.widget.candidatesAreaId + " li" );

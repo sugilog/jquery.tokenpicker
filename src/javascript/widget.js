@@ -1,3 +1,5 @@
+var REMOVE = "×";
+
 jQuery.tokenpicker.widget = {
   baseId:        ( "#tokenpicker_widget_base_"   + jQuery.tokenpicker.items.baseName ),
   frameId:       ( "#tokenpicker_widget_frame_"  + jQuery.tokenpicker.items.baseName ),
