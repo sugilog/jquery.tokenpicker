@@ -1,0 +1,133 @@
+.tokenpicker_base
+{
+  position: relative;
+}
+.tokenpicker_frame,
+.tokenpicker_frame_with_clear
+{
+  margin: 0;
+  padding: 0;
+  height: auto !important;
+  min-height: 1px;
+
+  clear: left;
+  overflow: hidden;
+  z-index: 999;
+
+  cursor: text;
+  border: 1px solid #999999;
+  list-style-type: none;
+}
+.tokenpicker_frame_with_clear
+{
+  padding-right: 15px;
+}
+.tokenpicker_frame_items
+{
+  margin: none;
+  padding: none;
+
+  float: left;
+  list-style-type: none;
+
+  color: #666666;
+  font-family: sans-serif;
+}
+.tokenpicker_frame_picked_token,
+.tokenpicker_frame_input_container
+{
+  margin: 3px;
+  padding: 2px 3px;
+  height: auto !important;
+
+  overflow: hidden;
+  white-space: nowrap;
+}
+.tokenpicker_frame_picked_token
+{
+  background-color: #eff2f7;
+  border: 1px solid #ccd5e4;
+  border-radius: 5px 5px 5px 5px;
+  cursor: default;
+
+  color: #000000;
+}
+.tokenpicker_frame_sortable_placeholder
+{
+  margin: 3px;
+  padding: 2px 3px;
+  height: auto !important;
+
+  float: left;
+  list-style-type: none;
+
+  border: 1px dotted #ccd5e4;
+  border-radius: 5px 5px 5px 5px;
+
+  color: #eff2f7;
+  font-family: sans-serif;
+}
+.tokenpicker_remove_token,
+.tokenpicker_clear_token
+{
+  margin-left: 5px;
+
+  cursor: pointer;
+
+  color: #999999;
+  font-weight: bold;
+}
+.tokenpicker_input
+{
+  padding: 5px;
+  width: 50px;
+
+  border: 0 none;
+  outline: none;
+
+  color: #666666;
+  font-family: sans-serif;
+}
+.tokenpicker_candidates_area
+{
+  margin: 0;
+  padding: 0;
+  height: auto !important;
+  min-height: 1px;
+
+  z-index: 999;
+  overflow: hidden;
+
+  border: 1px solid #999999;
+  list-style-type: none;
+  cursor: pointer;
+}
+.tokenpicker_token_candidates
+{
+  margin: none;
+  padding: 3px;
+
+  list-style-type: none;
+
+  color: #666666;
+  font-family: sans-serif;
+}
+.tokenpicker_candidates_not_found
+{
+  /*font-style: italic;*/
+}
+.tokenpicker_candidates_found
+{
+}
+.tokenpicker_current_pick
+{
+  background-color: #add8e6 !important;
+}
+.tokenpicker_clear_token
+{
+  position: absolute;
+  top:   0px;
+  right: 5px;
+  margin-top: 5px;
+  bottom: 0px;
+}
