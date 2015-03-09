@@ -12,6 +12,7 @@ wrapTemplate = "/*!\n" +
                "*/\n" +
                "\n" +
                "( function() {\n" +
+                 '"use strict";\n' +
                  "<%= data.contents %>" +
                "})();";
 
