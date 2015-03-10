@@ -9,6 +9,11 @@ Require
 - jQuery UI 1.8+
   - sortable required
 
+How to use
+------------------------------------------------------------
+
+Checkout the files in dist directory, into your project.
+
 Options
 ------------------------------------------------------------
 <dl>
@@ -217,6 +222,24 @@ example:
     </script>
 
 
+Development
+------------------------------------------------------------
+
+### Required environment
+
+require `node.js` to use `gulp` (building) and `karma` (testing).
+
+after clone this repository, do `npm install`
+
+(karma and its plugins are better to be global)
+
+
+### Building
+
+do `gulp` to make files in dist.
+
+
 Licence
 ------------------------------------------------------------
 jquery.tokenpicker is licenced under the MIT License.
+
