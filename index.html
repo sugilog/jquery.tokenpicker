@@ -127,9 +127,13 @@
   jQuery("input[name=prefecture_token]").tokenpicker({
     onPick: function( items ) {
       console.log( "pick" );
+
+      jQuery.each( items, function( _, item ) {
+        jQuery.tokenpicker.util.remove( jQuery( "input[name=name_token]" ), jQuery( item ).data().token )
+      });
     },
     onRemove: function( item ) {
-      console.log("remove");
+     console.log("remove");
     },
     onSort: function( items ) {
       console.log( "sort" );

@@ -32,3 +32,49 @@ jQuery.tokenpicker.search = {
     return result;
   }
 };
+
+jQuery.tokenpicker.util = {
+  remove: function( context, removeToken ) {
+    var token,
+        items = jQuery.tokenpicker.widget.pickedToken.items( context ),
+        config = jQuery.tokenpicker.config( context );
+
+    jQuery.each( items, function( _, item ) {
+      if ( jQuery( item ).data().token === removeToken ) {
+        token = jQuery( item );
+        return false;
+      }
+    });
+
+    if ( !token ) {
+      return false;
+    }
+    
+    token.find( "." + config.items.cssClass.removeToken ).trigger( "click" );
+  },
+  add: function( context, addToken ) {
+    var token,
+        items = jQuery.tokenpicker.widget.pickedToken.items( context ),
+        config = jQuery.tokenpicker.config( context );
+
+    jQuery.each( items, function( _, item ) {
+      if ( jQuery( item ).data().token === addToken ) {
+        token = jQuery( item );
+        return false;
+      }
+    });
+
+    if ( token ) {
+      return false;
+    }
+
+    jQuery.each( config.tokens, function( _, item ) {
+      if ( item.token === addToken ) {
+        token = item;
+        return false;
+      }
+    });
+
+    config.events.onAddToken( token );
+  }
+};

@@ -142,6 +142,21 @@ jQuery.fn.tokenpicker = function( options ) {
         config.items.callback.onPick.apply( context, [ tokens ] );
       }
     },
+    onAddToken: function( token ) {
+      var tokens;
+
+      if ( token ) {
+        tokens = jQuery.tokenpicker.widget.token( context, token );
+        jQuery.tokenpicker.widget.pickedToken.setVal( context );
+
+        if ( jQuery.isFunction( config.items.callback.onPick ) ) {
+          config.items.callback.onPick.apply( context, [ tokens ] );
+        }
+      }
+      else {
+        return false;
+      }
+    },
     onRemoveToken: function( event ) {
       var token = jQuery( this ).closest( "." + config.items.cssClass.pickedToken ),
           data  = token.data();
@@ -190,7 +205,7 @@ jQuery.fn.tokenpicker = function( options ) {
     }
   };
 
-  context.events = events;
+  config.events = events;
 
   run();
 };
@@ -364,9 +379,9 @@ jQuery.tokenpicker.widget = {
       .sortable( {
         placeholder: config.items.cssClass.sortablePlaceholder,
         // EVENT: start sorting
-        start: context.events.onSortableStart,
+        start: config.events.onSortableStart,
         // EVENT: end sorting
-        update: context.events.onSortableUpdate
+        update: config.events.onSortableUpdate
       })
       .appendTo( jQuery( config.items.selector.baseId ) );
 
@@ -377,7 +392,7 @@ jQuery.tokenpicker.widget = {
         })
         .addClass( config.items.cssClass.clearButton )
         .text( REMOVE )
-        .on( "click.tokenpicker", context.events.onClearToken )
+        .on( "click.tokenpicker", config.events.onClearToken )
         .appendTo( jQuery( config.items.selector.baseId ) );
     }
   },
@@ -394,11 +409,11 @@ jQuery.tokenpicker.widget = {
       .attr( "autocomplete", "off" )
       .addClass( config.items.cssClass.input )
       // EVENT: observe inputing
-      .observeField( 0.15, context.events.onInputSearchWord )
+      .observeField( 0.15, config.events.onInputSearchWord )
       // EVENT: focus inputing
-      .on( "focus.tokenpicker", context.events.onFocusInputField )
+      .on( "focus.tokenpicker", config.events.onFocusInputField )
       // EVENT: key control
-      .on( "keydown.tokenpicker", context.events.onSelectTokenCandidates );
+      .on( "keydown.tokenpicker", config.events.onSelectTokenCandidates );
 
     jQuery( "<li>" )
       .addClass( config.items.cssClass.tokenItems )
@@ -463,7 +478,7 @@ jQuery.tokenpicker.widget = {
         .addClass( config.items.cssClass.removeToken )
         .text( REMOVE )
         // EVENT: remove token item
-        .on( "click.tokenpicker", context.events.onRemoveToken );
+        .on( "click.tokenpicker", config.events.onRemoveToken );
 
       tmp = item.clone( true )
       tmp
@@ -553,7 +568,7 @@ jQuery.tokenpicker.widget = {
     setVal: function( context ) {
       var pickedTokens = jQuery.tokenpicker.widget.pickedToken.tokens( context ),
           config = jQuery.tokenpicker.config( context );
-      context.val(pickedTokens.join( config.items.tokenSeparator ));
+      context.val( pickedTokens.join( config.items.tokenSeparator ) );
     }
   },
   candidateItem: {
@@ -616,6 +631,52 @@ jQuery.tokenpicker.search = {
     });
 
     return result;
+  }
+};
+
+jQuery.tokenpicker.util = {
+  remove: function( context, removeToken ) {
+    var token,
+        items = jQuery.tokenpicker.widget.pickedToken.items( context ),
+        config = jQuery.tokenpicker.config( context );
+
+    jQuery.each( items, function( _, item ) {
+      if ( jQuery( item ).data().token === removeToken ) {
+        token = jQuery( item );
+        return false;
+      }
+    });
+
+    if ( !token ) {
+      return false;
+    }
+    
+    token.find( "." + config.items.cssClass.removeToken ).trigger( "click" );
+  },
+  add: function( context, addToken ) {
+    var token,
+        items = jQuery.tokenpicker.widget.pickedToken.items( context ),
+        config = jQuery.tokenpicker.config( context );
+
+    jQuery.each( items, function( _, item ) {
+      if ( jQuery( item ).data().token === addToken ) {
+        token = jQuery( item );
+        return false;
+      }
+    });
+
+    if ( token ) {
+      return false;
+    }
+
+    jQuery.each( config.tokens, function( _, item ) {
+      if ( item.token === addToken ) {
+        token = item;
+        return false;
+      }
+    });
+
+    config.events.onAddToken( token );
   }
 };
 

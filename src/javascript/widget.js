@@ -51,9 +51,9 @@ jQuery.tokenpicker.widget = {
       .sortable( {
         placeholder: config.items.cssClass.sortablePlaceholder,
         // EVENT: start sorting
-        start: context.events.onSortableStart,
+        start: config.events.onSortableStart,
         // EVENT: end sorting
-        update: context.events.onSortableUpdate
+        update: config.events.onSortableUpdate
       })
       .appendTo( jQuery( config.items.selector.baseId ) );
 
@@ -64,7 +64,7 @@ jQuery.tokenpicker.widget = {
         })
         .addClass( config.items.cssClass.clearButton )
         .text( REMOVE )
-        .on( "click.tokenpicker", context.events.onClearToken )
+        .on( "click.tokenpicker", config.events.onClearToken )
         .appendTo( jQuery( config.items.selector.baseId ) );
     }
   },
@@ -81,11 +81,11 @@ jQuery.tokenpicker.widget = {
       .attr( "autocomplete", "off" )
       .addClass( config.items.cssClass.input )
       // EVENT: observe inputing
-      .observeField( 0.15, context.events.onInputSearchWord )
+      .observeField( 0.15, config.events.onInputSearchWord )
       // EVENT: focus inputing
-      .on( "focus.tokenpicker", context.events.onFocusInputField )
+      .on( "focus.tokenpicker", config.events.onFocusInputField )
       // EVENT: key control
-      .on( "keydown.tokenpicker", context.events.onSelectTokenCandidates );
+      .on( "keydown.tokenpicker", config.events.onSelectTokenCandidates );
 
     jQuery( "<li>" )
       .addClass( config.items.cssClass.tokenItems )
@@ -150,7 +150,7 @@ jQuery.tokenpicker.widget = {
         .addClass( config.items.cssClass.removeToken )
         .text( REMOVE )
         // EVENT: remove token item
-        .on( "click.tokenpicker", context.events.onRemoveToken );
+        .on( "click.tokenpicker", config.events.onRemoveToken );
 
       tmp = item.clone( true )
       tmp
@@ -240,7 +240,7 @@ jQuery.tokenpicker.widget = {
     setVal: function( context ) {
       var pickedTokens = jQuery.tokenpicker.widget.pickedToken.tokens( context ),
           config = jQuery.tokenpicker.config( context );
-      context.val(pickedTokens.join( config.items.tokenSeparator ));
+      context.val( pickedTokens.join( config.items.tokenSeparator ) );
     }
   },
   candidateItem: {

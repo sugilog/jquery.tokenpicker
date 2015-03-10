@@ -133,6 +133,21 @@ jQuery.fn.tokenpicker = function( options ) {
         config.items.callback.onPick.apply( context, [ tokens ] );
       }
     },
+    onAddToken: function( token ) {
+      var tokens;
+
+      if ( token ) {
+        tokens = jQuery.tokenpicker.widget.token( context, token );
+        jQuery.tokenpicker.widget.pickedToken.setVal( context );
+
+        if ( jQuery.isFunction( config.items.callback.onPick ) ) {
+          config.items.callback.onPick.apply( context, [ tokens ] );
+        }
+      }
+      else {
+        return false;
+      }
+    },
     onRemoveToken: function( event ) {
       var token = jQuery( this ).closest( "." + config.items.cssClass.pickedToken ),
           data  = token.data();
@@ -181,7 +196,7 @@ jQuery.fn.tokenpicker = function( options ) {
     }
   };
 
-  context.events = events;
+  config.events = events;
 
   run();
 };
