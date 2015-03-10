@@ -1,7 +1,6 @@
 jQuery.tokenpicker.configure = function( context, options ) {
   var name,
-      config = {},
-      noop = function(){};
+      config = {};
 
   options = jQuery.extend(
     { placeholders: {}, images: {} },
@@ -64,7 +63,8 @@ jQuery.extend(
       });
     },
     items: function( context, options ) {
-      var baseName = jQuery.tokenpicker.config.contextName( context );
+      var baseName = jQuery.tokenpicker.config.contextName( context ),
+          noop = function(){};
 
       return {
         baseName:       baseName,
