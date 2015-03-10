@@ -212,7 +212,7 @@ jQuery.fn.tokenpicker = function( options ) {
 
 jQuery.tokenpicker.configure = function( context, options ) {
   var name,
-      config = {},
+      config = {};
 
   options = jQuery.extend(
     { placeholders: {}, images: {} },
