@@ -709,7 +709,7 @@ if (typeof jQuery.fn.observeField === "undefined") {
   };
 }
 
-if (typeof jQuery.fn.outerOn === "undefined" && typeof jQuery.fn.outerOff === "undefined") {
+if ( typeof jQuery.fn.outerOn === "undefined" && typeof jQuery.fn.outerOff === "undefined" ) {
   jQuery.fn.outerOn = function() {
     var args = jQuery( arguments ).toArray(),
         self = this,
@@ -730,12 +730,12 @@ if (typeof jQuery.fn.outerOn === "undefined" && typeof jQuery.fn.outerOff === "u
   };
 
   jQuery.fn.outerOff = function() {
-    var args = jQuery(arguments).toArray(),
+    var args = jQuery( arguments ).toArray(),
         self = this,
         handleEvent = ( args.shift() + [ ".outer" + "_" + self.eq( 0 ).prop( "id" ) ].join() ),
         selector    = "body";
 
-    if ( typeof args[0] !== "undefined" ) {
+    if ( typeof args[ 0 ] !== "undefined" ) {
       selector = args.shift();
     }
 
