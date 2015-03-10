@@ -164,7 +164,58 @@ example:
 
 Utility Methods
 ------------------------------------------------------------
-none. (please tell me if you need.)
+
+<dl>
+  <dt>jQuery.tokenpicker.util.remove</dt>
+  <dd>
+    [function] remove given token from given tokenpicker context.
+
+    <dl>
+      <dt>arguments</dt>
+      <dd>
+        `context` is tokenpicker-ed input filed (jQuery dom object).
+
+        `removeToken` is remove-token value.
+      </dd>
+    </dl>
+  </dd>
+  <dt>jQuery.tokenpicker.util.add</dt>
+  <dd>
+    [function] add given token to given tokenpicker context.
+
+    <dl>
+      <dt>arguments</dt>
+      <dd>
+        `context` is tokenpicker-ed input filed (jQuery dom object).
+
+        `addToken` is add-token value.
+      </dd>
+    </dl>
+  </dd>
+</dl>
+
+example:
+
+    <input type="text" name="active_user_token" />
+    <input type="text" name="inactive_user_token" />
+    <script type="text/javascript">
+    <!--
+    jQuery( "input[name=active_user_token]" ).tokenpicker( {
+      // options ...
+    });
+    jQuery( "input[name=inactive_user_token]" ).tokenpicker( {
+      onPick: function( items ) {
+        var context = jQuery( "input[name=active_user_token]" );
+
+        jQuery.each( items, function( _, item ) {
+          jQuery.tokenpicker.util.remove( context, item.data().token );
+        });
+      },
+      // options ...
+    });
+    -->
+    </script>
+
 
 Licence
 ------------------------------------------------------------

@@ -129,7 +129,7 @@
       console.log( "pick" );
 
       jQuery.each( items, function( _, item ) {
-        jQuery.tokenpicker.util.remove( jQuery( "input[name=name_token]" ), jQuery( item ).data().token )
+        jQuery.tokenpicker.util.remove( jQuery( "input[name=name_token]" ), item.data().token )
       });
     },
     onRemove: function( item ) {
