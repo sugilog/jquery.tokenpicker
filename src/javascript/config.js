@@ -1,6 +1,7 @@
 jQuery.tokenpicker.configure = function( context, options ) {
   var name,
-      config = {};
+      config = {},
+      noop = function(){};
 
   options = jQuery.extend(
     { placeholders: {}, images: {} },
@@ -104,10 +105,10 @@ jQuery.extend(
           candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + baseName )
         },
         callback: {
-          onPick:   options.onPick,
-          onRemove: options.onRemove,
-          onSort:   options.onSort,
-          onClear:  options.onClear
+          onPick:   options.onPick || noop,
+          onRemove: options.onRemove || noop,
+          onSort:   options.onSort || noop,
+          onClear:  options.onClear || noop
         }
       };
     }

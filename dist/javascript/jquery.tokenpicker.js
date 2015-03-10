@@ -138,7 +138,7 @@ jQuery.fn.tokenpicker = function( options ) {
       events.onCloseCandidates.apply( this, [ event ] );
       events.afterCloseCandidates.apply( this, [ event ] );
 
-      if ( current.length > 0 && jQuery.isFunction( config.items.callback.onPick ) ) {
+      if ( current.length > 0 ) {
         config.items.callback.onPick.apply( context, [ tokens ] );
       }
     },
@@ -148,10 +148,7 @@ jQuery.fn.tokenpicker = function( options ) {
       if ( token ) {
         tokens = jQuery.tokenpicker.widget.token( context, token );
         jQuery.tokenpicker.widget.pickedToken.setVal( context );
-
-        if ( jQuery.isFunction( config.items.callback.onPick ) ) {
-          config.items.callback.onPick.apply( context, [ tokens ] );
-        }
+        config.items.callback.onPick.apply( context, [ tokens ] );
       }
       else {
         return false;
@@ -164,7 +161,7 @@ jQuery.fn.tokenpicker = function( options ) {
       token.remove();
       jQuery.tokenpicker.widget.pickedToken.setVal( context );
 
-      if ( token.length > 0 && jQuery.isFunction( config.items.callback.onRemove ) ) {
+      if ( token.length > 0 ) {
         config.items.callback.onRemove.apply( context, [ data ] );
       }
     },
@@ -180,7 +177,7 @@ jQuery.fn.tokenpicker = function( options ) {
       tokens.remove();
       jQuery.tokenpicker.widget.pickedToken.setVal( context );
 
-      if ( tokens.length > 0 && jQuery.isFunction( config.items.callback.onClear ) ) {
+      if ( tokens.length > 0 ) {
         config.items.callback.onClear.apply( context, [ data ] );
       }
     },
@@ -198,10 +195,7 @@ jQuery.fn.tokenpicker = function( options ) {
     },
     onSortableUpdate: function( event, ui ) {
       jQuery.tokenpicker.widget.pickedToken.setVal( context );
-
-      if ( jQuery.isFunction( config.items.callback.onSort ) ) {
-        config.items.callback.onSort.apply( context, [ jQuery.tokenpicker.widget.pickedToken.items( context ) ] );
-      }
+      config.items.callback.onSort.apply( context, [ jQuery.tokenpicker.widget.pickedToken.items( context ) ] );
     }
   };
 
@@ -212,7 +206,8 @@ jQuery.fn.tokenpicker = function( options ) {
 
 jQuery.tokenpicker.configure = function( context, options ) {
   var name,
-      config = {};
+      config = {},
+      noop = function(){};
 
   options = jQuery.extend(
     { placeholders: {}, images: {} },
@@ -316,10 +311,10 @@ jQuery.extend(
           candidatesAreaId: ( "#tokenpicker_widget_candidatesArea_" + baseName )
         },
         callback: {
-          onPick:   options.onPick,
-          onRemove: options.onRemove,
-          onSort:   options.onSort,
-          onClear:  options.onClear
+          onPick:   options.onPick || noop,
+          onRemove: options.onRemove || noop,
+          onSort:   options.onSort || noop,
+          onClear:  options.onClear || noop
         }
       };
     }
