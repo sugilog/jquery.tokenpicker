@@ -680,7 +680,7 @@ jQuery.tokenpicker.util = {
   }
 };
 
-if (typeof jQuery.fn.observeField === "undefined") {
+if ( typeof jQuery.fn.observeField === "undefined" ) {
   // jquery.observe_field
   // https://github.com/splendeo/jquery.observe_field
   jQuery.fn.observeField = function(frequency, callback) {
