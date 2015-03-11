@@ -36,20 +36,20 @@ jQuery.fn.tokenpicker = function( options ) {
       jQuery.tokenpicker.widget.candidatesArea( context );
     },
     onInputSearchWord: function( event ) {
+      var result, candidatesArea;
+
       if ( jQuery( this ).val() === "" ) {
-        events.onCloseCandidates.apply( this, [ event ] );
-        events.afterCloseCandidates.apply( this, [ event ] );
+        result = [];
       }
       else {
-        var result,
-            candidatesArea = jQuery( config.items.selector.candidatesAreaId );
-
         result = jQuery.tokenpicker.search.exec( context, this );
-        jQuery.tokenpicker.widget.candidatesArea( context, result );
+      }
 
-        if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
-          jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, candidatesArea.children().eq( 0 ) );
-        }
+      jQuery.tokenpicker.widget.candidatesArea( context, result );
+      candidatesArea = jQuery( config.items.selector.candidatesAreaId );
+
+      if ( candidatesArea.hasClass( config.items.cssClass.found ) ) {
+        jQuery.tokenpicker.widget.candidateItem.setCurrentPick( context, candidatesArea.children().eq( 0 ) );
       }
     },
     onMouseoverCandidates: function( event ) {
