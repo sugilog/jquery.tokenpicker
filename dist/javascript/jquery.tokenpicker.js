@@ -646,7 +646,7 @@ jQuery.tokenpicker.util = {
       return false;
     }
     
-    token.find( "." + config.items.cssClass.removeToken ).trigger( "click" );
+    config.events.onRemoveToken.apply( token.find( "." + config.items.cssClass.removeToken ), [] );
   },
   add: function( context, addToken ) {
     var token,
