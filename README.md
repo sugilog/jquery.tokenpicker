@@ -171,6 +171,17 @@ Utility Methods
 ------------------------------------------------------------
 
 <dl>
+  <dt>jQuery.tokenpicker.util.clear</dt>
+  <dd>
+    [function] remove given token from given tokenpicker context.
+
+    <dl>
+      <dt>arguments</dt>
+      <dd>
+        `context` is tokenpicker-ed input filed (jQuery dom object).
+      </dd>
+    </dl>
+  </dd>
   <dt>jQuery.tokenpicker.util.remove</dt>
   <dd>
     [function] remove given token from given tokenpicker context.
