@@ -630,6 +630,12 @@ jQuery.tokenpicker.search = {
 };
 
 jQuery.tokenpicker.util = {
+  clear: function( context ) {
+    var token,
+        config = jQuery.tokenpicker.config( context );
+
+    config.events.onClearToken();
+  },
   remove: function( context, removeToken ) {
     var token,
         items = jQuery.tokenpicker.widget.pickedToken.items( context ),
