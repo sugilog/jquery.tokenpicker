@@ -29,6 +29,8 @@ Options
       <dt>arguments</dt>
       <dd>
         "items" of picked (selected) items. (Array of jQuery dom object)
+        <br />
+        "isGroup" is a flag of picked (selected) items are group or not. (boolean)
       </dd>
     </dl>
   </dd>
