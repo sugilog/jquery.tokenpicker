@@ -1,5 +1,5 @@
 /*!
- * jquery.tokenpicker v0.0.3
+ * jquery.tokenpicker v0.0.4
  *
  * Copyright (c) Takayuki Sugita, https://github.com/sugilog/jquery.tokenpicker
  * Released under the MIT License
@@ -128,7 +128,8 @@ jQuery.fn.tokenpicker = function( options ) {
     },
     onPickToken: function( event ) {
       var tokens,
-          current = jQuery.tokenpicker.widget.candidateItem.currentPick( context );
+          current = jQuery.tokenpicker.widget.candidateItem.currentPick( context ),
+          isGroup = typeof (current.data() || {}).tokens !== "undefined";
 
       if ( current.length > 0 ) {
         tokens = jQuery.tokenpicker.widget.token( context, current );
@@ -139,16 +140,17 @@ jQuery.fn.tokenpicker = function( options ) {
       events.afterCloseCandidates.apply( this, [ event ] );
 
       if ( current.length > 0 ) {
-        config.items.callback.onPick.apply( context, [ tokens ] );
+        config.items.callback.onPick.apply( context, [ tokens, isGroup ] );
       }
     },
     onAddToken: function( token ) {
-      var tokens;
+      var tokens,
+          isGroup = false;
 
       if ( token ) {
         tokens = jQuery.tokenpicker.widget.token( context, token );
         jQuery.tokenpicker.widget.pickedToken.setVal( context );
-        config.items.callback.onPick.apply( context, [ tokens ] );
+        config.items.callback.onPick.apply( context, [ tokens, isGroup ] );
       }
       else {
         return false;

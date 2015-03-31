@@ -26,10 +26,11 @@
   <script type="text/javascript">
   <!--
   jQuery("input[name=name_token]").tokenpicker({
-    onPick: function( items ){
-      console.log( "pick" );
-      console.log( this   );
-      console.log( items  );
+    onPick: function( items, isGroup ){
+      console.log( "pick"  );
+      console.log( this    );
+      console.log( items   );
+      console.log( isGroup );
 
       jQuery.each( items, function( _, item ) {
         console.log( item.data() );
