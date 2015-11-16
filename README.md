@@ -210,6 +210,17 @@ Utility Methods
       </dd>
     </dl>
   </dd>
+  <dt>jQuery.tokenpicker.util.focus</dt>
+  <dd>
+    [function] focus on given tokenpicker context.
+
+    <dl>
+      <dt>arguments</dt>
+      <dd>
+        `context` is tokenpicker-ed input filed (jQuery dom object).
+      </dd>
+    </dl>
+  </dd>
 </dl>
 
 example:

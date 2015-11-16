@@ -680,6 +680,11 @@ jQuery.tokenpicker.util = {
     });
 
     config.events.onAddToken( token );
+  },
+  focus: function( context ) {
+    var config = jQuery.tokenpicker.config( context );
+
+    jQuery( config.items.selector.inputId ).focus();
   }
 };
 
