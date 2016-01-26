@@ -22,7 +22,20 @@
   <form action="">
   <input type="submit" />
 
-  <input type="text" name="name_token" value="" />
+  <dl>
+    <dt style="float:left; clear: left; width: 2em;">
+      選択
+    </dt>
+    <dd style="margin-left: 3em;">
+      <input type="text" name="name_token" value="" />
+    </dd>
+    <dt style="float:left; clear: left; width: 2em;">
+      ※
+    </dt>
+    <dd style="margin-left: 3em;">
+      県をえらんでください。
+    </dd>
+  </dl>
   <script type="text/javascript">
   <!--
   jQuery("input[name=name_token]").tokenpicker({
@@ -55,9 +68,9 @@
     labelKey:   'name',
     tokenKey:   'id',
     imageKey:   'image',
-    images: {
-      display: true
-    },
+    // images: {
+    //   display: true
+    // },
     separator:  ',',
     clearButton: true,
     tokens: [

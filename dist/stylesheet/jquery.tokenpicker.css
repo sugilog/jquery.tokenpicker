@@ -2,6 +2,13 @@
 {
   position: relative;
 }
+.tokenpicker_base:after {
+  display: block;
+  clear: both;
+  height: 0px;
+  visibility: hidden;
+  content: ".";
+}
 .tokenpicker_frame,
 .tokenpicker_frame_with_clear
 {
@@ -10,7 +17,6 @@
   height: auto !important;
   min-height: 1px;
 
-  clear: left;
   overflow: hidden;
   z-index: 999;
 
