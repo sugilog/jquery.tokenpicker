@@ -169,6 +169,7 @@ jQuery.fn.tokenpicker = function( options ) {
 
       tokens.remove();
       jQuery.tokenpicker.widget.pickedToken.setVal( context );
+      jQuery.tokenpicker.util.focus( context );
 
       if ( tokens.length > 0 ) {
         config.items.callback.onClear.apply( context, [ data ] );
