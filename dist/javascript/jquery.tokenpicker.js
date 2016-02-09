@@ -1,5 +1,5 @@
 /*!
- * jquery.tokenpicker v0.0.4
+ * jquery.tokenpicker v0.0.5
  *
  * Copyright (c) Takayuki Sugita, https://github.com/sugilog/jquery.tokenpicker
  * Released under the MIT License
